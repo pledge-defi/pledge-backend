@@ -16,7 +16,7 @@ func init() {
 		return
 	}
 	if _, err := toml.DecodeFile(tomlFile, &Config); err != nil {
-		panic("config read from toml err: " + err.Error())
+		panic("read toml file err: " + err.Error())
 		return
 	}
 }
