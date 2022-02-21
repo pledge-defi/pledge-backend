@@ -1,0 +1,50 @@
+[mysql]
+address = "192.168.0.106"
+#address = "127.0.0.1"
+port = "3306"
+db_name = "pledge_v22"
+user_name = "pledge_v22"
+password = "pledge_v22"
+max_open_conns = 0
+max_idle_conns = 0
+max_life_time = 0
+
+[redis]
+address = "192.168.0.106"
+#address = "127.0.0.1"
+port = "6379"
+db_name = "pledgev22"
+user_name = ""
+password = "pledger_web3"
+max_idle = 0
+max_active = 0
+idle_timeout = 0
+
+[testnet]
+chain_id = "97"
+net_url = "https://data-seed-prebsc-1-s1.binance.org:8545"
+pledge_pool_token = "0x216f718A983FCCb462b338FA9c60f2A89199490c"
+bsc_pledge_oracle_token = "0xd96DBDC193617A0cD4bbf38E78a0fB4799A8E554"
+
+[mainnet]
+chain_id = "56"
+net_url = "https://bsc-dataseed2.ninicoin.io"
+pledge_pool_token = "0x78CE5055149Dc30755612209f9d9A98f36fb022E"
+bsc_pledge_oracle_token = "0x6cc2B5D12aD1Cc66149F2fb895ca863e9aEbD31e"
+
+[token]
+logo_url = "https://tokens.pancakeswap.finance/pancakeswap-top-100.json"
+
+[defaultadmin]
+username = "admin"
+password = "password"
+
+[jwt]
+expire_time = 2592000
+secret_key = "243223ffslsfsldfl412fdsfsdf"
+
+[env]
+port = "8080"
+version = "22"
+protocol = "https"
+domain_name = "v2-backend.pledger.finance"
