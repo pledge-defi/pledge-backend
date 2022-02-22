@@ -23,7 +23,7 @@ func (c *SearchService) Search(req *request.Search) (int, int64, []models.Pool) 
 	if req.State != "" {
 		whereCondition += fmt.Sprintf(` and state='%v'`, req.State)
 	}
-	err, total, data := models.NewPool().Page(req, whereCondition)
+	err, total, data := models.NewPool().Pagination(req, whereCondition)
 	if err != nil {
 		log.Logger.Error(err.Error())
 		return statecode.COMMON_ERR_SERVER_ERR, 0, nil

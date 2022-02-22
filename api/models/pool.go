@@ -31,7 +31,7 @@ func NewPool() *Pool {
 	return &Pool{}
 }
 
-func (p *Pool) Page(req *request.Search, whereCondition string) (error, int64, []Pool) {
+func (p *Pool) Pagination(req *request.Search, whereCondition string) (error, int64, []Pool) {
 	var total int64
 	pools := []Pool{}
 	poolBase := []models.PoolBase{}
