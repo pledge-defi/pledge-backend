@@ -24,7 +24,7 @@ func NewTokenSymbol() *TokenSymbol {
 }
 
 // get contract symbol
-func (s *TokenSymbol) UpdateContractSymbol() error {
+func (s *TokenSymbol) UpdateContractSymbol() {
 	var tokens []models.TokenInfo
 	nowDateTime := utils.GetCurDateTimeFormat()
 	db.Mysql.Table("token_info").Find(&tokens)
@@ -66,8 +66,6 @@ func (s *TokenSymbol) UpdateContractSymbol() error {
 		// Avoid blockchain servers treating programs as crawlers
 		time.Sleep(time.Second)
 	}
-
-	return nil
 }
 
 // get and save remote abi file on main net

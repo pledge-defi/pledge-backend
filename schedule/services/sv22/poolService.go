@@ -20,12 +20,11 @@ func NewPool() *poolService {
 	return &poolService{}
 }
 
-func (s *poolService) UpdateAllPoolInfo() error {
+func (s *poolService) UpdateAllPoolInfo() {
 
 	s.UpdatePoolInfo(config.Config.TestNet.PledgePoolToken, config.Config.TestNet.NetUrl, config.Config.TestNet.ChainId)
 	s.UpdatePoolInfo(config.Config.MainNet.PledgePoolToken, config.Config.MainNet.NetUrl, config.Config.MainNet.ChainId)
 
-	return nil
 }
 
 func (s *poolService) UpdatePoolInfo(contractAddress, network, chainId string) {

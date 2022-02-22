@@ -19,7 +19,7 @@ func NewTokenPrice() *TokenPrice {
 }
 
 // update contract price
-func (s *TokenPrice) UpdateContractPrice() error {
+func (s *TokenPrice) UpdateContractPrice() {
 	var tokens []models.TokenInfo
 	nowDateTime := utils.GetCurDateTimeFormat()
 	db.Mysql.Table("token_info").Find(&tokens)
@@ -51,7 +51,6 @@ func (s *TokenPrice) UpdateContractPrice() error {
 			continue
 		}
 	}
-	return nil
 }
 
 // get contract price on main net
