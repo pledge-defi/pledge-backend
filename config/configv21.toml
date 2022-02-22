@@ -43,6 +43,6 @@ secret_key = "243223ffslsfsldfl412fdsfsdf"
 
 [env]
 port = "8080"
-vsrsion = "21"
+version = "21"
 protocol = "https"
 domain_name = "dev-v2-backend.pledger.finance"
