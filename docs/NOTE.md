@@ -1,6 +1,6 @@
 The commands of creating go files from ABI and BIN files
 
-    abigen --abi abi/v21/pledge_pool.abi --bin bin/v21/pledge_pool.bin --pkg pledge_pool_token --out
+    abigen --abi abi/v21/pledge_pool.abi --bin bin/v21/pledge_pool.bin --pkg tokengo --out
     pledgePoolToken.go
 
 The go token files of the main network and the test network need to be generated
