@@ -1,0 +1,14 @@
+[Unit]
+Description=pledge api service
+After=mysql.service
+StartLimitBurst=5
+StartLimitIntervalSec=20 
+[Service]
+Type=simple
+Restart=always
+RestartSec=1
+User=root
+ExecStart=/home/ubuntu/codespace/pledge-backend/api/pledge_api
+[Install]
+WantedBy=multi-user.target
+
