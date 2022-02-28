@@ -70,7 +70,7 @@ func (s *TokenSymbol) UpdateContractSymbol() {
 
 // GetRemoteAbiFileByToken get and save remote abi file on main net
 func (s *TokenSymbol) GetRemoteAbiFileByToken(token string) error {
-	url := "https://api.bscscan.com/api?module=contract&action=getabi&address=" + token
+	url := "https://api.bscscan.com/api?module=contract&action=getabi&apikey=HJ3WS4N88QJ6S7PQ8D89BD49IZIFP1JFER&address=" + token
 	res, err := utils.HttpGet(url)
 	if err != nil {
 		return err
