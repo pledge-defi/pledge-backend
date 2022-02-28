@@ -80,6 +80,10 @@ func (s *TokenSymbol) GetRemoteAbiFileByToken(token string) error {
 		return err
 	}
 	resStr := strings.Replace(string(res), `\`, "", -1)
+	resStr = strings.Replace(resStr, `result\":\"[`, `result":[`, -1)
+	resStr = strings.Replace(resStr, `result":"[`, `result":[`, -1)
+	resStr = strings.Replace(resStr, `]\"}`, `]}`, -1)
+	resStr = strings.Replace(resStr, `]"}`, `]}`, -1)
 	log.Logger.Sugar().Info("-----------------------+", string(res))
 	log.Logger.Sugar().Info("-----------------------++", resStr)
 	abiJson := models.AbiJson{}
