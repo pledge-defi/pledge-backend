@@ -40,7 +40,7 @@ func (s *TokenSymbol) UpdateContractSymbol() {
 			err, symbol = s.GetContractSymbolOnTestNet(t.Token, config.Config.TestNet.NetUrl)
 		} else if t.ChainId == "56" {
 			if t.AbiFileExist == 0 {
-				err = s.GetRemoteAbiFileByToken(t.Token)
+				err = s.GetRemoteAbiFileByToken(t.Token, t.ChainId)
 				if err != nil {
 					log.Logger.Sugar().Error("UpdateContractSymbol GetRemoteAbiFileByToken err ", t.Symbol, t.ChainId, err)
 					continue
@@ -70,31 +70,28 @@ func (s *TokenSymbol) UpdateContractSymbol() {
 }
 
 // GetRemoteAbiFileByToken get and save remote abi file on main net
-func (s *TokenSymbol) GetRemoteAbiFileByToken(token string) error {
+func (s *TokenSymbol) GetRemoteAbiFileByToken(token, chainId string) error {
 	url := "https://api.bscscan.com/api?module=contract&action=getabi&apikey=HJ3WS4N88QJ6S7PQ8D89BD49IZIFP1JFER&address=" + token
-	log.Logger.Sugar().Info("-----------------------", url)
 	res, err := utils.HttpGet(url)
 	if err != nil {
 		log.Logger.Error(err.Error())
 		return err
 	}
-	resStr := strings.Replace(string(res), `\`, "", -1)
-	resStr = strings.Replace(resStr, `result\":\"[`, `result":[`, -1)
-	resStr = strings.Replace(resStr, `result":"[`, `result":[`, -1)
-	resStr = strings.Replace(resStr, `]\"}`, `]}`, -1)
-	resStr = strings.Replace(resStr, `]"}`, `]}`, -1)
-	log.Logger.Sugar().Info("-----------------------+", string(res))
-	log.Logger.Sugar().Info("-----------------------++", resStr)
+
+	resStr := s.FormatAbiJsonStr(string(res))
+
 	abiJson := models.AbiJson{}
 	err = json.Unmarshal([]byte(resStr), &abiJson)
 	if err != nil {
 		log.Logger.Error(err.Error())
 		return err
 	}
+
 	if abiJson.Status != "1" {
 		log.Logger.Error("get remote abi file failed: status 0 ")
 		return errors.New("get remote abi file failed: status 0")
 	}
+
 	abiJsonBytes, err := json.MarshalIndent(abiJson.Result, "", "\t")
 	if err != nil {
 		log.Logger.Error(err.Error())
@@ -105,27 +102,27 @@ func (s *TokenSymbol) GetRemoteAbiFileByToken(token string) error {
 
 	err = os.WriteFile(newAbi, abiJsonBytes, 0777)
 	if err != nil {
-		log.Logger.Error("---++++++++")
 		log.Logger.Error(err.Error())
 		return err
 	}
 
-	//file, err := os.OpenFile(newAbi, os.O_WRONLY|os.O_APPEND|os.O_CREATE, 0777)
-	//if err != nil {
-	//	fmt.Println("open file failed.")
-	//}
-	//
-	//file.WriteString(string(abiJsonBytes))
-	//file.WriteString("\n")
-	//file.Close()
-
-	err = db.Mysql.Table("token_info").Where("token=?", token).Updates(map[string]interface{}{
+	err = db.Mysql.Table("token_info").Where("token=? and chain_id=?", token, chainId).Updates(map[string]interface{}{
 		"abi_file_exist": 1,
 	}).Debug().Error
 	if err != nil {
 		return err
 	}
 	return nil
+}
+
+// FormatAbiJsonStr format the abi string
+func (s *TokenSymbol) FormatAbiJsonStr(result string) string {
+	resStr := strings.Replace(result, `\`, "", -1)
+	resStr = strings.Replace(resStr, `result\":\"[`, `result":[`, -1)
+	resStr = strings.Replace(resStr, `result":"[`, `result":[`, -1)
+	resStr = strings.Replace(resStr, `]\"}`, `]}`, -1)
+	resStr = strings.Replace(resStr, `]"}`, `]}`, -1)
+	return resStr
 }
 
 // GetContractSymbolOnMainNet get contract symbol on main net
