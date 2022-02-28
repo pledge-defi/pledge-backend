@@ -2,7 +2,6 @@ package sv22
 
 import (
 	"errors"
-	"fmt"
 	"github.com/ethereum/go-ethereum/common"
 	"github.com/ethereum/go-ethereum/ethclient"
 	"pledge-backend/config"
@@ -45,7 +44,6 @@ func (s *TokenPrice) UpdateContractPrice() {
 		}
 
 		priceRedis, err := db.RedisGetInt64("token_info:price:" + t.Token + "_" + t.ChainId)
-		fmt.Println(err != nil, priceRedis == price, priceRedis, price, "---------------------")
 		if err != nil {
 			if err.Error() == "redigo: nil returned" {
 				err = db.RedisSetInt64("token_info:price:"+t.Token+"_"+t.ChainId, price, 120)
