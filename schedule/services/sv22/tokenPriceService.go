@@ -43,10 +43,10 @@ func (s *TokenPrice) UpdateContractPrice() {
 			continue
 		}
 
-		priceRedis, err := db.RedisGetInt64("token_info:price:" + t.Token)
+		priceRedis, err := db.RedisGetInt64("token_info:price:" + t.Token + "_" + t.ChainId)
 		if err != nil {
 			if err.Error() == "redigo: nil returned" {
-				err = db.RedisSetInt64("token_info:price:"+t.Token, price, 120)
+				err = db.RedisSetInt64("token_info:price:"+t.Token+"_"+t.ChainId, price, 120)
 			} else {
 				log.Logger.Sugar().Error("UpdateContractPrice get price from redis err ", t.Symbol, t.ChainId, err)
 			}
@@ -54,7 +54,7 @@ func (s *TokenPrice) UpdateContractPrice() {
 			if priceRedis == price {
 				continue
 			}
-			err = db.RedisSetInt64("token_info:price:"+t.Token, price, 120)
+			err = db.RedisSetInt64("token_info:price:"+t.Token+"_"+t.ChainId, price, 120)
 		}
 
 		err = db.Mysql.Table("token_info").Where("id=?", t.Id).Updates(map[string]interface{}{
