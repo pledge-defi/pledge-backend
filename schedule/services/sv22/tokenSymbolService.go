@@ -2,6 +2,7 @@ package sv22
 
 import (
 	"errors"
+	"fmt"
 	"github.com/ethereum/go-ethereum/accounts/abi"
 	"github.com/ethereum/go-ethereum/accounts/abi/bind"
 	"github.com/ethereum/go-ethereum/common"
@@ -71,19 +72,12 @@ func (s *TokenSymbol) UpdateContractSymbol() {
 // GetRemoteAbiFileByToken get and save remote abi file on main net
 func (s *TokenSymbol) GetRemoteAbiFileByToken(token string) error {
 	url := "https://api.bscscan.com/api?module=contract&action=getabi&apikey=HJ3WS4N88QJ6S7PQ8D89BD49IZIFP1JFER&address=" + token
+	fmt.Println(url)
 	res, err := utils.HttpGet(url)
 	if err != nil {
 		return err
 	}
 	log.Logger.Info(string(res))
-
-	//var out bytes.Buffer
-	//err = json.Indent(&out, res, "", "\t")
-	//if err != nil {
-	//	fmt.Print("err")
-	//}
-	//
-	//log.Logger.Info(string(out.Bytes()))
 
 	newAbi := abifile.GetCurrentAbPathByCaller() + "/v" + config.Config.Env.Version + "/" + token + ".abi"
 
