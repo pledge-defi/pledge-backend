@@ -3,7 +3,6 @@ package sv22
 import (
 	"encoding/json"
 	"errors"
-	"fmt"
 	"github.com/ethereum/go-ethereum/accounts/abi"
 	"github.com/ethereum/go-ethereum/accounts/abi/bind"
 	"github.com/ethereum/go-ethereum/common"
@@ -92,9 +91,11 @@ func (s *TokenSymbol) GetRemoteAbiFileByToken(token string) error {
 		log.Logger.Error(err.Error())
 		return err
 	}
-	log.Logger.Sugar().Info("-----------------------+++", abiJson.Status)
-	log.Logger.Sugar().Info("-----------------------++++", abiJson.Result)
-	abiJsonBytes, err := json.Marshal(abiJson.Result)
+	if abiJson.Status != "1" {
+		log.Logger.Error("get remote abi file failed: status 0 ")
+		return errors.New("get remote abi file failed: status 0")
+	}
+	abiJsonBytes, err := json.MarshalIndent(abiJson.Result, "", "\t")
 	if err != nil {
 		log.Logger.Error(err.Error())
 		return err
@@ -102,19 +103,19 @@ func (s *TokenSymbol) GetRemoteAbiFileByToken(token string) error {
 
 	newAbi := abifile.GetCurrentAbPathByCaller() + "/v" + config.Config.Env.Version + "/" + token + ".abi"
 
-	//err = os.WriteFile(newAbi, abiJsonBytes, 0777)
-	//if err != nil {
-	//	return err
-	//}
-
-	file, err := os.OpenFile(newAbi, os.O_WRONLY|os.O_APPEND|os.O_CREATE, 0777)
+	err = os.WriteFile(newAbi, abiJsonBytes, 0777)
 	if err != nil {
-		fmt.Println("open file failed.")
+		return err
 	}
 
-	file.WriteString(string(abiJsonBytes))
-	file.WriteString("\n")
-	file.Close()
+	//file, err := os.OpenFile(newAbi, os.O_WRONLY|os.O_APPEND|os.O_CREATE, 0777)
+	//if err != nil {
+	//	fmt.Println("open file failed.")
+	//}
+	//
+	//file.WriteString(string(abiJsonBytes))
+	//file.WriteString("\n")
+	//file.Close()
 
 	err = db.Mysql.Table("token_info").Where("token=?", token).Updates(map[string]interface{}{
 		"abi_file_exist": 1,
