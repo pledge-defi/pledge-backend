@@ -222,18 +222,6 @@ func HttpGet(url string) ([]byte, error) {
 	}
 	req.Header.Add("user-agent", "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_16_0) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/78.0.3904.108 Safari/537.36")
 	req.Header.Add("authority", "api.bscscan.com")
-	req.Header.Add("method", "GET")
-	req.Header.Add("path", "/api?module=contract&action=getabi&address=")
-	req.Header.Add("scheme", "https")
-	req.Header.Add("accept", "text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3")
-	req.Header.Add("accept-encoding", "gzip, deflate, br")
-	req.Header.Add("accept-language", "zh-CN,zh;q=0.9,en;q=0.8,zh-TW;q=0.7")
-	req.Header.Add("cache-control", "max-age=0")
-	req.Header.Add("cookie", "_ga=GA1.2.884965333.1644421892; _gid=GA1.2.1856142465.1644671181")
-	req.Header.Add("sec-fetch-mode", "navigate")
-	req.Header.Add("sec-fetch-site", "none")
-	req.Header.Add("sec-fetch-user", "?1")
-	req.Header.Add("upgrade-insecure-requests", "1")
 
 	client := &http.Client{Timeout: 5 * time.Second}
 	resp, err := client.Do(req)

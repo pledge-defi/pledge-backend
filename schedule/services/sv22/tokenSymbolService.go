@@ -95,10 +95,20 @@ func (s *TokenSymbol) GetRemoteAbiFileByToken(token string) error {
 
 	newAbi := abifile.GetCurrentAbPathByCaller() + "/v" + config.Config.Env.Version + "/" + token + ".abi"
 
-	err = os.WriteFile(newAbi, abiJsonBytes, 0777)
+	//err = os.WriteFile(newAbi, abiJsonBytes, 0777)
+	//if err != nil {
+	//	return err
+	//}
+
+	file, err := os.OpenFile(newAbi, os.O_WRONLY|os.O_APPEND|os.O_CREATE, 0777)
 	if err != nil {
-		return err
+		fmt.Println("open file failed.")
 	}
+
+	file.WriteString(string(abiJsonBytes))
+	file.WriteString("\n")
+	file.Close()
+
 	err = db.Mysql.Table("token_info").Where("token=?", token).Updates(map[string]interface{}{
 		"abi_file_exist": 1,
 	}).Debug().Error
