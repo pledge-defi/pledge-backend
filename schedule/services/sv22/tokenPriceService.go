@@ -19,7 +19,7 @@ func NewTokenPrice() *TokenPrice {
 	return &TokenPrice{}
 }
 
-// update contract price
+// UpdateContractPrice update contract price
 func (s *TokenPrice) UpdateContractPrice() {
 	var tokens []models.TokenInfo
 	nowDateTime := utils.GetCurDateTimeFormat()
@@ -62,7 +62,7 @@ func (s *TokenPrice) UpdateContractPrice() {
 	}
 }
 
-// get contract price on main net
+// GetMainNetTokenPrice get contract price on main net
 func (s *TokenPrice) GetMainNetTokenPrice(token string) (error, int64) {
 	ethereumConn, err := ethclient.Dial(config.Config.MainNet.NetUrl)
 	if nil != err {
@@ -85,7 +85,7 @@ func (s *TokenPrice) GetMainNetTokenPrice(token string) (error, int64) {
 	return nil, price.Int64()
 }
 
-// get contract price on test net
+// GetTestNetTokenPrice get contract price on test net
 func (s *TokenPrice) GetTestNetTokenPrice(token string) (error, int64) {
 	ethereumConn, err := ethclient.Dial(config.Config.TestNet.NetUrl)
 	if nil != err {
