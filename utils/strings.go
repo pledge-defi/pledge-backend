@@ -15,7 +15,7 @@ func StringToInt(i string) int {
 	return j
 }
 
-//judge a string whether in the  string list
+// IsContain judge a string whether in the  string list
 func IsContain(target string, List []string) bool {
 
 	for _, element := range List {
@@ -39,7 +39,7 @@ func StructToJsonString(param interface{}) string {
 	return dataString
 }
 
-//The incoming parameter must be a pointer
+// JsonStringToStruct The incoming parameter must be a pointer
 func JsonStringToStruct(s string, args interface{}) error {
 	err := json.Unmarshal([]byte(s), args)
 	return err

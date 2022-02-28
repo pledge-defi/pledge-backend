@@ -6,7 +6,7 @@ import (
 	"path/filepath"
 )
 
-// Determine whether the given path is a folder
+// IsDir Determine whether the given path is a folder
 func IsDir(path string) bool {
 	s, err := os.Stat(path)
 	if err != nil {
@@ -15,7 +15,7 @@ func IsDir(path string) bool {
 	return s.IsDir()
 }
 
-// Determine whether the given path is a file
+// IsFile Determine whether the given path is a file
 func IsFile(path string) bool {
 	return !IsDir(path)
 }

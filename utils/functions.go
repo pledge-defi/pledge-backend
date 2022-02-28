@@ -21,14 +21,14 @@ import (
 	"time"
 )
 
-//生成32位md5字串
+// GetMd5String 生成32位md5字串
 func GetMd5String(s string) string {
 	h := md5.New()
 	h.Write([]byte(s))
 	return hex.EncodeToString(h.Sum(nil))
 }
 
-//生成Guid字串
+// UniqueId 生成Guid字串
 func UniqueId() string {
 	b := make([]byte, 48)
 	if _, err := io.ReadFull(rand.Reader, b); err != nil {
@@ -47,14 +47,14 @@ func JsonToMap(str string) map[string]interface{} {
 	return tempMap
 }
 
-// 生成验证码
+// GenerateCode 生成验证码
 func GenerateCode(figures int) (randNum string) {
 	startNum := math.Pow(10, float64(figures))
 	number := mrand.New(mrand.NewSource(time.Now().UnixNano())).Int31n(int32(startNum))
 	return fmt.Sprintf("%06d", number)
 }
 
-// 判断是否为手机号码
+// IsPhone 判断是否为手机号码
 func IsPhone(phoneNo string) bool {
 	if phoneNo != "" {
 		if isOk, _ := regexp.MatchString(`^1[0-9]{10}$`, phoneNo); isOk {
@@ -64,7 +64,7 @@ func IsPhone(phoneNo string) bool {
 	return false
 }
 
-// 判断是否为数字
+// IsNumb 判断是否为数字
 func IsNumb(num string) bool {
 	if num != "" {
 		if isOk, _ := regexp.MatchString(`^[0-9]*$`, num); isOk {
@@ -75,6 +75,7 @@ func IsNumb(num string) bool {
 }
 
 /*
+CheckAccountFormat
 判断账户是否为字母开头的字母和数字组合
 字母开口，限制6-20位，可以使用数字和字母
 */
@@ -88,7 +89,7 @@ func CheckAccountFormat(s string) bool {
 	return false
 }
 
-// 判断是否为合法密码
+// IsPassword 判断是否为合法密码
 func IsPassword(pwd string) bool {
 	if pwd != "" {
 		if isOk, _ := regexp.MatchString(`^[a-zA-Z0-9!@#￥%^&*]{6,20}$`, pwd); isOk {
@@ -98,7 +99,7 @@ func IsPassword(pwd string) bool {
 	return false
 }
 
-// 判断是否为合法邮箱-
+// IsEmail 判断是否为合法邮箱-
 func IsEmail(email string) bool {
 	if email != "" {
 		if isOk, _ := regexp.MatchString(`^[a-zA-Z0-9_-]+@[a-zA-Z0-9_-]+(\.[a-zA-Z0-9_-]+)+$`, email); isOk {
@@ -111,7 +112,7 @@ func IsEmail(email string) bool {
 	return false
 }
 
-//字符串转int64
+// StringToInt64 字符串转int64
 func StringToInt64(s string) int64 {
 	int64Num, _ := strconv.ParseInt(s, 10, 64)
 	return int64Num
@@ -123,19 +124,19 @@ func StringToInt64(s string) int64 {
 //	return float
 //}
 
-//int64转字符串
+// Int64ToString int64转字符串
 func Int64ToString(n int64) string {
 	i := int64(n)
 	return strconv.FormatInt(i, 10)
 }
 
-//int32转字符串
+// Int32ToString int32转字符串
 func Int32ToString(n int32) string {
 	i := int64(n)
 	return strconv.FormatInt(i, 10)
 }
 
-//int32转字符串
+// StringToInt32 int32转字符串
 func StringToInt32(s string) int32 {
 	var j int32
 	int10, _ := strconv.ParseInt(s, 10, 32)
@@ -143,19 +144,19 @@ func StringToInt32(s string) int32 {
 	return j
 }
 
-//int64转字int
+// Int64ToInt int64转字int
 func Int64ToInt(n int64) int {
 	strInt64 := strconv.FormatInt(n, 10)
 	id16, _ := strconv.Atoi(strInt64)
 	return id16
 }
 
-//将float64转成精确的int64
+// Wrap 将float64转成精确的int64
 func Wrap(num float64, retain int) int64 {
 	return int64(num * math.Pow10(retain))
 }
 
-//将int64恢复成正常的float64
+// Unwrap 将int64恢复成正常的float64
 func Unwrap(num int64, retain int) float64 {
 	return float64(num) / math.Pow10(retain)
 }
@@ -165,12 +166,12 @@ func WrapToFloat64(num float64, retain int) float64 {
 	return num * math.Pow10(retain)
 }
 
-//精准int64
+// UnwrapToInt64 精准int64
 func UnwrapToInt64(num int64, retain int) int64 {
 	return int64(Unwrap(num, retain))
 }
 
-//判断文件或文件夹是否存在
+// PathExists 判断文件或文件夹是否存在
 func PathExists(path string) (bool, error) {
 	_, err := os.Stat(path)
 	if err == nil {
@@ -182,7 +183,7 @@ func PathExists(path string) (bool, error) {
 	return false, err
 }
 
-// 随机生成指定位数的大小写字母和数字的组合
+// GetRandomString 随机生成指定位数的大小写字母和数字的组合
 func GetRandomString(n int) string {
 	str := "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789"
 	bytes := []byte(str)
@@ -194,7 +195,7 @@ func GetRandomString(n int) string {
 	return string(result)
 }
 
-//生成10位随机数字
+// CreateCaptcha 生成10位随机数字
 func CreateCaptcha() string {
 	randomInt := mrand.New(mrand.NewSource(time.Now().UnixNano())).Int63n(10000000000)
 	if randomInt < 1000000000 {
@@ -203,15 +204,18 @@ func CreateCaptcha() string {
 	return fmt.Sprintf("%d", randomInt)
 }
 
-//生成20位随机数字转账密码串
+// Encryption 生成20位随机数字转账密码串
 func Encryption() string {
 	return CreateCaptcha() + CreateCaptcha()
 }
 
-//发送GET请求
-//url:请求地址
-//response:请求返回的内容
-func HttpGet(url string) (string, error) {
+/*
+HttpGet发送GET请求
+url:请求地址
+response:请求返回的内容
+*/
+
+func HttpGet(url string) ([]byte, error) {
 	req, err := http.NewRequest("GET", url, nil)
 	if err != nil {
 		panic(err)
@@ -234,15 +238,20 @@ func HttpGet(url string) (string, error) {
 	client := &http.Client{Timeout: 5 * time.Second}
 	resp, err := client.Do(req)
 	if err != nil {
-		return "", err
+		return nil, err
 	}
-	defer resp.Body.Close()
-	result, _ := ioutil.ReadAll(resp.Body)
 
-	return string(result), nil
+	defer resp.Body.Close()
+
+	result, err := ioutil.ReadAll(resp.Body)
+	if err != nil {
+		return nil, err
+	}
+
+	return result, nil
 }
 
-//发送POST请求
+// Post 发送POST请求
 //url:请求地址，data:POST请求提交的数据,contentType:请求体格式，如：application/json
 //content:请求放回的内容
 func Post(uri string, data interface{}, args ...string) (content string) {
@@ -290,7 +299,7 @@ func Post(uri string, data interface{}, args ...string) (content string) {
 	return
 }
 
-//float64 相加返回 string
+// Float64AddToString float64 相加返回 string
 func Float64AddToString(fa, fb float64) string {
 	decimalA := decimal.NewFromFloat(fa)
 	decimalB := decimal.NewFromFloat(fb)
@@ -298,7 +307,7 @@ func Float64AddToString(fa, fb float64) string {
 	return decimalC.String()
 }
 
-//float64 相减返回 string
+// Float64SubToString float64 相减返回 string
 func Float64SubToString(fa, fb float64) string {
 	decimalA := decimal.NewFromFloat(fa)
 	decimalB := decimal.NewFromFloat(fb)
@@ -306,7 +315,7 @@ func Float64SubToString(fa, fb float64) string {
 	return decimalC.String()
 }
 
-//float64 相乘返回 string
+// Float64MulToString float64 相乘返回 string
 func Float64MulToString(fa, fb float64) string {
 	decimalA := decimal.NewFromFloat(fa)
 	decimalB := decimal.NewFromFloat(fb)
@@ -314,7 +323,7 @@ func Float64MulToString(fa, fb float64) string {
 	return decimalC.String()
 }
 
-//float64 相除返回 string
+// Float64DivToString float64 相除返回 string
 func Float64DivToString(fa, fb float64) string {
 	decimalA := decimal.NewFromFloat(fa)
 	decimalB := decimal.NewFromFloat(fb)
@@ -322,7 +331,7 @@ func Float64DivToString(fa, fb float64) string {
 	return decimalC.String()
 }
 
-//float64 相加返回 float64
+// Float64AddToFloat64 float64 相加返回 float64
 func Float64AddToFloat64(fa, fb float64) float64 {
 	decimalA := decimal.NewFromFloat(fa)
 	decimalB := decimal.NewFromFloat(fb)
@@ -331,7 +340,7 @@ func Float64AddToFloat64(fa, fb float64) float64 {
 	return res
 }
 
-//float64 相减返回 float64
+// Float64SubToFloat64 float64 相减返回 float64
 func Float64SubToFloat64(fa, fb float64) float64 {
 	decimalA := decimal.NewFromFloat(fa)
 	decimalB := decimal.NewFromFloat(fb)
@@ -340,7 +349,7 @@ func Float64SubToFloat64(fa, fb float64) float64 {
 	return res
 }
 
-//float64 相乘返回 float64
+// Float64MulToFloat64 float64 相乘返回 float64
 func Float64MulToFloat64(fa, fb float64) float64 {
 	decimalA := decimal.NewFromFloat(fa)
 	decimalB := decimal.NewFromFloat(fb)
@@ -349,7 +358,7 @@ func Float64MulToFloat64(fa, fb float64) float64 {
 	return res
 }
 
-//float64 相除返回 float64
+// Float64DivToFloat64 float64 相除返回 float64
 func Float64DivToFloat64(fa, fb float64) float64 {
 	decimalA := decimal.NewFromFloat(fa)
 	decimalB := decimal.NewFromFloat(fb)
@@ -358,7 +367,7 @@ func Float64DivToFloat64(fa, fb float64) float64 {
 	return res
 }
 
-//float64 相减返回 float64
+// Float64SubToFloat64s float64 相减返回 float64
 func Float64SubToFloat64s(args ...float64) float64 {
 	totalAmount := decimal.NewFromFloat(0)
 	for _, val := range args {
@@ -369,7 +378,7 @@ func Float64SubToFloat64s(args ...float64) float64 {
 	return res
 }
 
-//string 相加返回 string
+// StringAddToString string 相加返回 string
 func StringAddToString(sa, sb string) (string, error) {
 	decimalA, err := decimal.NewFromString(sa)
 	if err != nil {
@@ -383,7 +392,7 @@ func StringAddToString(sa, sb string) (string, error) {
 	return decimalC.String(), nil
 }
 
-//string 相减返回 string
+// StringSubToString string 相减返回 string
 func StringSubToString(sa, sb string) (string, error) {
 	decimalA, err := decimal.NewFromString(sa)
 	if err != nil {
@@ -397,7 +406,7 @@ func StringSubToString(sa, sb string) (string, error) {
 	return decimalC.String(), nil
 }
 
-//string 相减返回 string 多个值
+// StringSubStrings string 相减返回 string 多个值
 func StringSubStrings(args ...string) (string, error) {
 	totalAmount, _ := decimal.NewFromString("0")
 	for _, val := range args {
@@ -410,7 +419,7 @@ func StringSubStrings(args ...string) (string, error) {
 	return totalAmount.String(), nil
 }
 
-//string 相乘返回 string
+// StringMulToString string 相乘返回 string
 func StringMulToString(sa, sb string) (string, error) {
 	decimalA, err := decimal.NewFromString(sa)
 	if err != nil {
@@ -424,7 +433,7 @@ func StringMulToString(sa, sb string) (string, error) {
 	return decimalC.String(), nil
 }
 
-//string 相除返回 string
+// StringDivToString string 相除返回 string
 func StringDivToString(sa, sb string) (string, error) {
 	decimalA, err := decimal.NewFromString(sa)
 	if err != nil {

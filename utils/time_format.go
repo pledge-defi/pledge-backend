@@ -10,50 +10,50 @@ const (
 	HalfOffset = 12 * 3600 //Half-day hourly offset
 )
 
-//Get the current timestamp by Second
+// GetCurrentTimestampBySecond Get the current timestamp by Second
 func GetCurrentTimestampBySecond() int64 {
 	return time.Now().Unix()
 }
 
-//Convert timestamp to time.Time type
+// UnixSecondToTime Convert timestamp to time.Time type
 func UnixSecondToTime(second int64) time.Time {
 	return time.Unix(second, 0)
 }
 
-//Convert nano timestamp to time.Time type
+// UnixNanoSecondToTime Convert nano timestamp to time.Time type
 func UnixNanoSecondToTime(nanoSecond int64) time.Time {
 	return time.Unix(0, nanoSecond)
 }
 
-//Get the current timestamp by Nano
+// GetCurrentTimestampByNano Get the current timestamp by Nano
 func GetCurrentTimestampByNano() int64 {
 	return time.Now().UnixNano()
 }
 
-//Get the current timestamp by Mill
+// GetCurrentTimestampByMill Get the current timestamp by Mill
 func GetCurrentTimestampByMill() int64 {
 	return time.Now().UnixNano() / 1e6
 }
 
-//Get the timestamp at 0 o'clock of the day
+// GetCurDayZeroTimestamp Get the timestamp at 0 o'clock of the day
 func GetCurDayZeroTimestamp() int64 {
 	timeStr := time.Now().Format("2006-01-02")
 	t, _ := time.Parse("2006-01-02", timeStr)
 	return t.Unix() - TimeOffset
 }
 
-//Get the timestamp at 12 o'clock on the day
+// GetCurDayHalfTimestamp Get the timestamp at 12 o'clock on the day
 func GetCurDayHalfTimestamp() int64 {
 	return GetCurDayZeroTimestamp() + HalfOffset
 
 }
 
-//Get the formatted time at 0 o'clock of the day, the format is "2006-01-02_00-00-00"
+// GetCurDayZeroTimeFormat Get the formatted time at 0 o'clock of the day, the format is "2006-01-02_00-00-00"
 func GetCurDayZeroTimeFormat() string {
 	return time.Unix(GetCurDayZeroTimestamp(), 0).Format("2006-01-02_15-04-05")
 }
 
-//Get the formatted time at 12 o'clock of the day, the format is "2006-01-02_12-00-00"
+// GetCurDayHalfTimeFormat Get the formatted time at 12 o'clock of the day, the format is "2006-01-02_12-00-00"
 func GetCurDayHalfTimeFormat() string {
 	return time.Unix(GetCurDayZeroTimestamp()+HalfOffset, 0).Format("2006-01-02_15-04-05")
 }
@@ -70,7 +70,7 @@ func TimeStringFormatTimeUnix(timeFormat string, timeSrc string) int64 {
 	return tm.Unix()
 }
 
-//Get the format is "2006-01-02 15:04:05"
+// GetCurDateTimeFormat Get the format is "2006-01-02 15:04:05"
 func GetCurDateTimeFormat() string {
 	return time.Now().Format("2006-01-02 15:04:05")
 }
