@@ -1,9 +1,9 @@
 package models
 
 type AbiJson struct {
-	Status  string `json:"status"`
-	Message string `json:"message"`
-	Result  string `json:"result"`
+	Status  string   `json:"status"`
+	Message string   `json:"message"`
+	Result  []Result `json:"result"`
 }
 
 type Outputs struct {
