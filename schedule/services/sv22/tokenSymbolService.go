@@ -105,6 +105,8 @@ func (s *TokenSymbol) GetRemoteAbiFileByToken(token string) error {
 
 	err = os.WriteFile(newAbi, abiJsonBytes, 0777)
 	if err != nil {
+		log.Logger.Error("---++++++++")
+		log.Logger.Error(err.Error())
 		return err
 	}
 
