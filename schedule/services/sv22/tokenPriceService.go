@@ -25,7 +25,7 @@ func (s *TokenPrice) UpdateContractPrice() {
 	db.Mysql.Table("token_info").Find(&tokens)
 	for _, t := range tokens {
 		if t.Token == "" {
-			log.Logger.Sugar().Error("UpdateContractPrice tokengo empty ", t.Symbol, t.ChainId)
+			log.Logger.Sugar().Error("UpdateContractPrice token empty ", t.Symbol, t.ChainId)
 			continue
 		}
 		err := errors.New("")
