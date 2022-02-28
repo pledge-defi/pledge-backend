@@ -88,7 +88,7 @@ func (s *TokenSymbol) GetRemoteAbiFileByToken(token string) error {
 		log.Logger.Error(err.Error())
 		return err
 	}
-	//log.Logger.Sugar().Info("-----------------------+++", abiJson.Result)
+	log.Logger.Sugar().Info("-----------------------+++", abiJson.Status)
 	log.Logger.Sugar().Info("-----------------------++++", abiJson.Result)
 	abiJsonBytes, err := json.Marshal(abiJson.Result)
 	if err != nil {
