@@ -22,7 +22,7 @@ func NewTokenInfo() *TokenInfo {
 	return &TokenInfo{}
 }
 
-// Get token information by token name
+// GetBYName Get token information by token name
 func (t *TokenInfo) GetBYName(token, chainId string) (error, TokenInfo) {
 	tokenInfo := TokenInfo{}
 	err := db.Mysql.Table("token_info").Where("token=? and chain_id=?", token, chainId).First(&tokenInfo).Debug().Error

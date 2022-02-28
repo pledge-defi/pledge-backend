@@ -53,10 +53,10 @@ func (s *poolService) UpdatePoolInfo(contractAddress, network, chainId string) {
 		return
 	}
 	for i := 0; i <= int(pLength.Int64())-1; i++ {
-		pool_id := utils.IntToString(i + 1)
+		poolId := utils.IntToString(i + 1)
 		baseInfo, err := pledgePoolToken.PledgePoolTokenCaller.PoolBaseInfo(nil, big.NewInt(int64(i)))
 		if err != nil {
-			log.Logger.Sugar().Info("UpdatePoolInfo PoolBaseInfo err", pool_id, err)
+			log.Logger.Sugar().Info("UpdatePoolInfo PoolBaseInfo err", poolId, err)
 			continue
 		}
 
@@ -78,7 +78,7 @@ func (s *poolService) UpdatePoolInfo(contractAddress, network, chainId string) {
 
 		poolBase := models.PoolBase{
 			SettleTime:             baseInfo.SettleTime.String(),
-			PoolId:                 utils.StringToInt(pool_id),
+			PoolId:                 utils.StringToInt(poolId),
 			ChainId:                chainId,
 			EndTime:                baseInfo.EndTime.String(),
 			InterestRate:           baseInfo.InterestRate.String(),
@@ -98,26 +98,26 @@ func (s *poolService) UpdatePoolInfo(contractAddress, network, chainId string) {
 			AutoLiquidateThreshold: baseInfo.AutoLiquidateThreshold.String(),
 		}
 
-		hasInfoData, byteBaseInfoStr, baseInfoMd5Str := s.GetPoolMd5(&poolBase, "base_info:pool_"+chainId+"_"+pool_id)
+		hasInfoData, byteBaseInfoStr, baseInfoMd5Str := s.GetPoolMd5(&poolBase, "base_info:pool_"+chainId+"_"+poolId)
 		if !hasInfoData || (baseInfoMd5Str != byteBaseInfoStr) { // have new data
 			//tokenInfo
-			err = models.NewPoolBase().SavePoolBase(chainId, pool_id, &poolBase)
+			err = models.NewPoolBase().SavePoolBase(chainId, poolId, &poolBase)
 			if err != nil {
-				log.Logger.Sugar().Error("SavePoolBase err ", chainId, pool_id)
+				log.Logger.Sugar().Error("SavePoolBase err ", chainId, poolId)
 			}
-			db.RedisSet("base_info:pool_"+chainId+"_"+pool_id, baseInfoMd5Str, 60*30) //The expiration time is set to prevent hsah collision
+			db.RedisSet("base_info:pool_"+chainId+"_"+poolId, baseInfoMd5Str, 60*30) //The expiration time is set to prevent hsah collision
 		}
 
 		dataInfo, err := pledgePoolToken.PledgePoolTokenCaller.PoolDataInfo(nil, big.NewInt(int64(i)))
 		if err != nil {
-			log.Logger.Sugar().Info("UpdatePoolInfo PoolBaseInfo err", pool_id, err)
+			log.Logger.Sugar().Info("UpdatePoolInfo PoolBaseInfo err", poolId, err)
 			continue
 		}
 
-		hasPoolData, byteDataInfoStr, dataInfoMd5Str := s.GetPoolMd5(&poolBase, "data_info:pool_"+chainId+"_"+pool_id)
+		hasPoolData, byteDataInfoStr, dataInfoMd5Str := s.GetPoolMd5(&poolBase, "data_info:pool_"+chainId+"_"+poolId)
 		if !hasPoolData || (dataInfoMd5Str != byteDataInfoStr) { // have new data
 			poolData := models.PoolData{
-				PoolId:                 pool_id,
+				PoolId:                 poolId,
 				ChainId:                chainId,
 				FinishAmountBorrow:     dataInfo.FinishAmountBorrow.String(),
 				FinishAmountLend:       dataInfo.FinishAmountLend.String(),
@@ -126,11 +126,11 @@ func (s *poolService) UpdatePoolInfo(contractAddress, network, chainId string) {
 				SettleAmountBorrow:     dataInfo.SettleAmountBorrow.String(),
 				SettleAmountLend:       dataInfo.SettleAmountLend.String(),
 			}
-			err = models.NewPoolData().SavePoolData(chainId, pool_id, &poolData)
+			err = models.NewPoolData().SavePoolData(chainId, poolId, &poolData)
 			if err != nil {
-				log.Logger.Sugar().Error("SavePoolData err ", chainId, pool_id)
+				log.Logger.Sugar().Error("SavePoolData err ", chainId, poolId)
 			}
-			db.RedisSet("data_info:pool_"+chainId+"_"+pool_id, dataInfoMd5Str, 60*30) //The expiration time is set to prevent hsah collision
+			db.RedisSet("data_info:pool_"+chainId+"_"+poolId, dataInfoMd5Str, 60*30) //The expiration time is set to prevent hsah collision
 		}
 	}
 }
