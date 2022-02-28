@@ -78,12 +78,15 @@ func (s *TokenSymbol) GetRemoteAbiFileByToken(token string) error {
 	if err != nil {
 		return err
 	}
+	log.Logger.Info(string(res))
 
 	var out bytes.Buffer
 	err = json.Indent(&out, res, "", "\t")
 	if err != nil {
 		fmt.Print("err")
 	}
+
+	log.Logger.Info(string(out.Bytes()))
 
 	newAbi := abifile.GetCurrentAbPathByCaller() + "/v" + config.Config.Env.Version + "/" + token + ".abi"
 
