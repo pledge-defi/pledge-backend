@@ -7,6 +7,7 @@ import (
 )
 
 func TaskV21() {
+
 	// Init all the jobs
 	sv21.NewPool().UpdateAllPoolInfo()
 	sv21.NewTokenPrice().UpdateContractPrice()
@@ -22,6 +23,7 @@ func TaskV21() {
 }
 
 func TaskV22() {
+
 	//Init all the jobs
 	sv22.NewPool().UpdateAllPoolInfo()
 	sv22.NewTokenPrice().UpdateContractPrice()
