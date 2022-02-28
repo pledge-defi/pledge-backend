@@ -101,6 +101,7 @@ func (s *TokenLogo) UpdateTokenLogo() {
 }
 
 func GetBaseUrl() string {
+
 	domainName := config.Config.Env.DomainName
 	domainNameSlice := strings.Split(domainName, "")
 	pattern := "\\d+" //反斜杠要转义

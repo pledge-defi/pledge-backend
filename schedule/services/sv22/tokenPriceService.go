@@ -92,7 +92,7 @@ func (s *TokenPrice) GetTestNetTokenPrice(token string) (error, int64) {
 		log.Logger.Error(err.Error())
 		return err, 0
 	}
-	//这里要改为测试网的 token文件 go
+
 	bscPledgeOracleTestnetToken, err := tokengo.NewBscPledgeOracleTestnetToken(common.HexToAddress(config.Config.TestNet.BscPledgeOracleToken), ethereumConn)
 	if nil != err {
 		log.Logger.Error(err.Error())

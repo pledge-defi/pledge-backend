@@ -2,6 +2,7 @@ package sv21
 
 import (
 	"errors"
+	"fmt"
 	"github.com/ethereum/go-ethereum/common"
 	"github.com/ethereum/go-ethereum/ethclient"
 	"pledge-backend/config"
@@ -18,7 +19,7 @@ func NewTokenPrice() *TokenPrice {
 	return &TokenPrice{}
 }
 
-// update contract price
+// UpdateContractPrice update contract price
 func (s *TokenPrice) UpdateContractPrice() {
 	var tokens []models.TokenInfo
 	nowDateTime := utils.GetCurDateTimeFormat()
@@ -42,6 +43,14 @@ func (s *TokenPrice) UpdateContractPrice() {
 			log.Logger.Sugar().Error("UpdateContractPrice err ", t.Symbol, t.ChainId, err)
 			continue
 		}
+
+		//baseInfoBytes, _ := json.Marshal(&baseInfo)
+		//baseInfoMd5Str := utils.Md5(string(baseInfoBytes))
+
+		resBytes, err := db.RedisGet("token_info:" + t.Token)
+		fmt.Println(resBytes, err)
+		//db.RedisSet("base_info:pool_"+pool_id, baseInfoMd5Str, 60*30)
+
 		err = db.Mysql.Table("token_info").Where("id=?", t.Id).Updates(map[string]interface{}{
 			"price":      price,
 			"updated_at": nowDateTime,
@@ -53,7 +62,7 @@ func (s *TokenPrice) UpdateContractPrice() {
 	}
 }
 
-// get contract price on main net
+// GetMainNetTokenPrice get contract price on main net
 func (s *TokenPrice) GetMainNetTokenPrice(token string) (error, int64) {
 	ethereumConn, err := ethclient.Dial(config.Config.MainNet.NetUrl)
 	if nil != err {
@@ -76,14 +85,14 @@ func (s *TokenPrice) GetMainNetTokenPrice(token string) (error, int64) {
 	return nil, price.Int64()
 }
 
-// get contract price on test net
+// GetTestNetTokenPrice get contract price on test net
 func (s *TokenPrice) GetTestNetTokenPrice(token string) (error, int64) {
 	ethereumConn, err := ethclient.Dial(config.Config.TestNet.NetUrl)
 	if nil != err {
 		log.Logger.Error(err.Error())
 		return err, 0
 	}
-	//这里要改为测试网的 token文件 go
+
 	bscPledgeOracleTestnetToken, err := tokengo.NewBscPledgeOracleTestnetToken(common.HexToAddress(config.Config.TestNet.BscPledgeOracleToken), ethereumConn)
 	if nil != err {
 		log.Logger.Error(err.Error())
