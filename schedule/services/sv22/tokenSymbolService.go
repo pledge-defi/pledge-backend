@@ -1,10 +1,7 @@
 package sv22
 
 import (
-	"bytes"
-	"encoding/json"
 	"errors"
-	"fmt"
 	"github.com/ethereum/go-ethereum/accounts/abi"
 	"github.com/ethereum/go-ethereum/accounts/abi/bind"
 	"github.com/ethereum/go-ethereum/common"
@@ -80,17 +77,17 @@ func (s *TokenSymbol) GetRemoteAbiFileByToken(token string) error {
 	}
 	log.Logger.Info(string(res))
 
-	var out bytes.Buffer
-	err = json.Indent(&out, res, "", "\t")
-	if err != nil {
-		fmt.Print("err")
-	}
-
-	log.Logger.Info(string(out.Bytes()))
+	//var out bytes.Buffer
+	//err = json.Indent(&out, res, "", "\t")
+	//if err != nil {
+	//	fmt.Print("err")
+	//}
+	//
+	//log.Logger.Info(string(out.Bytes()))
 
 	newAbi := abifile.GetCurrentAbPathByCaller() + "/v" + config.Config.Env.Version + "/" + token + ".abi"
 
-	err = os.WriteFile(newAbi, out.Bytes(), 0777)
+	err = os.WriteFile(newAbi, res, 0777)
 	if err != nil {
 		return err
 	}
