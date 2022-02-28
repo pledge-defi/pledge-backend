@@ -79,13 +79,14 @@ func (s *TokenSymbol) GetRemoteAbiFileByToken(token string) error {
 		log.Logger.Error(err.Error())
 		return err
 	}
+	fmt.Println("-----------------------+", string(res))
 	abiJson := models.AbiJson{}
 	err = json.Unmarshal(res, &abiJson)
 	if err != nil {
 		log.Logger.Error(err.Error())
 		return err
 	}
-	fmt.Println("-----------------------+", abiJson.Result)
+	fmt.Println("-----------------------++", abiJson.Result)
 	abiJsonBytes, err := json.Marshal(abiJson.Result)
 	if err != nil {
 		log.Logger.Error(err.Error())
