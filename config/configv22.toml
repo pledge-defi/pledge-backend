@@ -1,6 +1,6 @@
 [mysql]
-address = "192.168.0.106"
-#address = "127.0.0.1"
+#address = "192.168.0.106"
+address = "127.0.0.1"
 port = "3306"
 db_name = "pledge_v22"
 user_name = "pledge_v22"
@@ -10,8 +10,8 @@ max_idle_conns = 0
 max_life_time = 0
 
 [redis]
-address = "192.168.0.106"
-#address = "127.0.0.1"
+#address = "192.168.0.106"
+address = "127.0.0.1"
 port = "6379"
 db_name = "pledgev22"
 user_name = ""
