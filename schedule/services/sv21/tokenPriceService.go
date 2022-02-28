@@ -2,7 +2,6 @@ package sv21
 
 import (
 	"errors"
-	"fmt"
 	"github.com/ethereum/go-ethereum/common"
 	"github.com/ethereum/go-ethereum/ethclient"
 	"pledge-backend/config"
@@ -44,12 +43,19 @@ func (s *TokenPrice) UpdateContractPrice() {
 			continue
 		}
 
-		//baseInfoBytes, _ := json.Marshal(&baseInfo)
-		//baseInfoMd5Str := utils.Md5(string(baseInfoBytes))
-
-		resBytes, err := db.RedisGet("token_info:" + t.Token)
-		fmt.Println(resBytes, err)
-		//db.RedisSet("base_info:pool_"+pool_id, baseInfoMd5Str, 60*30)
+		priceRedis, err := db.RedisGetInt64("token_info:price:" + t.Token)
+		if err != nil {
+			if err.Error() == "redigo: nil returned" {
+				err = db.RedisSetInt64("token_info:price:"+t.Token, price, 120)
+			} else {
+				log.Logger.Sugar().Error("UpdateContractPrice get price from redis err ", t.Symbol, t.ChainId, err)
+			}
+		} else {
+			if priceRedis == price {
+				continue
+			}
+			err = db.RedisSetInt64("token_info:price:"+t.Token, price, 120)
+		}
 
 		err = db.Mysql.Table("token_info").Where("id=?", t.Id).Updates(map[string]interface{}{
 			"price":      price,

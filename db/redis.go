@@ -39,7 +39,7 @@ func InitRedis() *redis.Pool {
 	return RedisConn
 }
 
-// 设置key、value、time
+// RedisSet 设置key、value、time
 func RedisSet(key string, data interface{}, time interface{}) error {
 	conn := RedisConn.Get()
 	defer conn.Close()
@@ -60,7 +60,7 @@ func RedisSet(key string, data interface{}, time interface{}) error {
 	return nil
 }
 
-// 获取Key
+// RedisGet 获取Key
 func RedisGet(key string) ([]byte, error) {
 	conn := RedisConn.Get()
 	defer conn.Close()
@@ -71,14 +71,57 @@ func RedisGet(key string) ([]byte, error) {
 	return reply, nil
 }
 
-// 删除Key
+// RedisGetString 获取Key
+func RedisGetString(key string) (string, error) {
+	conn := RedisConn.Get()
+	defer conn.Close()
+	reply, err := redis.String(conn.Do("get", key))
+	if err != nil {
+		return "", err
+	}
+	return reply, nil
+}
+
+// RedisSetInt64  set int64 value by key
+func RedisSetInt64(key string, data int64, time int) error {
+	conn := RedisConn.Get()
+	defer conn.Close()
+	value, err := json.Marshal(data)
+	if err != nil {
+		return err
+	}
+	_, err = redis.Int64(conn.Do("set", key, value))
+	if err != nil {
+		return err
+	}
+	if time != 0 {
+		_, err = redis.Int64(conn.Do("expire", key, time))
+		if err != nil {
+			return err
+		}
+	}
+	return nil
+}
+
+// RedisGetInt64 get int64 value by key
+func RedisGetInt64(key string) (int64, error) {
+	conn := RedisConn.Get()
+	defer conn.Close()
+	reply, err := redis.Int64(conn.Do("get", key))
+	if err != nil {
+		return -1, err
+	}
+	return reply, nil
+}
+
+// RedisDelete 删除Key
 func RedisDelete(key string) (bool, error) {
 	conn := RedisConn.Get()
 	defer conn.Close()
 	return redis.Bool(conn.Do("del", key))
 }
 
-// 获取Hash类型
+// RedisGetHash 获取Hash类型
 func RedisGetHash(key string) (map[string]string, error) {
 	conn := RedisConn.Get()
 	defer conn.Close()
@@ -89,7 +132,7 @@ func RedisGetHash(key string) (map[string]string, error) {
 	return reply, nil
 }
 
-// 获取Heah其中一个值
+// RedisGetHashOne 获取Heah其中一个值
 func RedisGetHashOne(key, name string) (interface{}, error) {
 	conn := RedisConn.Get()
 	defer conn.Close()
@@ -100,7 +143,7 @@ func RedisGetHashOne(key, name string) (interface{}, error) {
 	return reply, nil
 }
 
-// 设置Hash
+// RedisSetHash 设置Hash
 func RedisSetHash(key string, data map[string]string, time interface{}) error {
 	conn := RedisConn.Get()
 	defer conn.Close()
@@ -124,13 +167,13 @@ func RedisSetHash(key string, data map[string]string, time interface{}) error {
 	return nil
 }
 
-// 删除Hash
+// RedisDelHash 删除Hash
 func RedisDelHash(key string) (bool, error) {
 
 	return true, nil
 }
 
-// 检查Key是否存在
+// RedisExistsHash 检查Key是否存在
 func RedisExistsHash(key string) bool {
 	conn := RedisConn.Get()
 	defer conn.Close()
@@ -141,7 +184,7 @@ func RedisExistsHash(key string) bool {
 	return exists
 }
 
-// 检查Key是否存在
+// RedisExists 检查Key是否存在
 func RedisExists(key string) bool {
 	conn := RedisConn.Get()
 	defer conn.Close()
@@ -152,7 +195,7 @@ func RedisExists(key string) bool {
 	return exists
 }
 
-// 获取Key剩余时间
+// RedisGetTTL 获取Key剩余时间
 func RedisGetTTL(key string) int64 {
 	conn := RedisConn.Get()
 	defer conn.Close()
@@ -163,7 +206,7 @@ func RedisGetTTL(key string) int64 {
 	return reply
 }
 
-// set 集合
+// RedisSAdd set 集合
 func RedisSAdd(k, v string) int64 {
 	conn := RedisConn.Get()
 	defer conn.Close()
@@ -174,7 +217,7 @@ func RedisSAdd(k, v string) int64 {
 	return reply.(int64)
 }
 
-//获取集合元素
+// RedisSmembers 获取集合元素
 func RedisSmembers(k string) ([]string, error) {
 	conn := RedisConn.Get()
 	defer conn.Close()
@@ -191,7 +234,7 @@ type RedisEncryptionTask struct {
 	EndTime           int64  `json:"endTime"`         //失效截止时间
 }
 
-// 列表右侧添加数据
+// RedisListRpush 列表右侧添加数据
 func RedisListRpush(listName string, encryption string) error {
 	conn := RedisConn.Get()
 	defer conn.Close()
@@ -199,7 +242,7 @@ func RedisListRpush(listName string, encryption string) error {
 	return err
 }
 
-// 取出列表中所有元素
+// RedisListLRange 取出列表中所有元素
 func RedisListLRange(listName string) ([]string, error) {
 	conn := RedisConn.Get()
 	defer conn.Close()
@@ -207,7 +250,7 @@ func RedisListLRange(listName string) ([]string, error) {
 	return res, err
 }
 
-// 删除列表中指定元素
+// RedisListLRem 删除列表中指定元素
 func RedisListLRem(listName string, encryption string) error {
 	conn := RedisConn.Get()
 	defer conn.Close()
@@ -215,7 +258,7 @@ func RedisListLRem(listName string, encryption string) error {
 	return err
 }
 
-// 列表长度
+// RedisListLength 列表长度
 func RedisListLength(listName string) (interface{}, error) {
 	conn := RedisConn.Get()
 	defer conn.Close()
@@ -223,7 +266,7 @@ func RedisListLength(listName string) (interface{}, error) {
 	return len, err
 }
 
-// list 删除整个列表
+// RedisDelList list 删除整个列表
 func RedisDelList(setName string) error {
 	conn := RedisConn.Get()
 	defer conn.Close()
