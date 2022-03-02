@@ -2,11 +2,15 @@ package common
 
 import (
 	"github.com/jasonlvhit/gocron"
+	"pledge-backend/db"
 	"pledge-backend/schedule/services/sv21"
 	"pledge-backend/schedule/services/sv22"
 )
 
 func TaskV21() {
+
+	// flush redis db
+	db.RedisFlushDB()
 
 	// Init all the jobs
 	sv21.NewPool().UpdateAllPoolInfo()
@@ -23,6 +27,9 @@ func TaskV21() {
 }
 
 func TaskV22() {
+
+	// flush redis db
+	db.RedisFlushDB()
 
 	//Init all the jobs
 	sv22.NewPool().UpdateAllPoolInfo()

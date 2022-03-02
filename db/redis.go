@@ -132,6 +132,17 @@ func RedisGetHash(key string) (map[string]string, error) {
 	return reply, nil
 }
 
+// RedisFlushDB 清空当前DB
+func RedisFlushDB() error {
+	conn := RedisConn.Get()
+	defer conn.Close()
+	_, err := conn.Do("flushdb")
+	if err != nil {
+		return err
+	}
+	return nil
+}
+
 // RedisGetHashOne 获取Heah其中一个值
 func RedisGetHashOne(key, name string) (interface{}, error) {
 	conn := RedisConn.Get()

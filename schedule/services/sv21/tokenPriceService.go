@@ -2,6 +2,7 @@ package sv21
 
 import (
 	"errors"
+	"fmt"
 	"github.com/ethereum/go-ethereum/common"
 	"github.com/ethereum/go-ethereum/ethclient"
 	"pledge-backend/config"
@@ -51,6 +52,7 @@ func (s *TokenPrice) UpdateContractPrice() {
 				log.Logger.Sugar().Error("UpdateContractPrice get price from redis err ", t.Symbol, t.ChainId, err)
 			}
 		} else {
+			fmt.Println(priceRedis, price, "+++++++++")
 			if priceRedis == price {
 				continue
 			}
