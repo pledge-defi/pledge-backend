@@ -75,29 +75,27 @@ func (s *TokenLogo) UpdateTokenLogo() {
 
 // CheckLogoData Saving logo data to redis if it has new logo
 func (s *TokenLogo) CheckLogoData(token, chainId, logoUrl string) (bool, error) {
-	redisTokenInfoBytes, err := db.RedisGet("token_info:" + token + "_" + chainId)
-	if err != nil {
-		if err.Error() == "redigo: nil returned" {
-			err = s.CheckTokenInfo(token, chainId)
-			if err != nil {
-				log.Logger.Error(err.Error())
-			}
-			err = db.RedisSet("token_info:"+token+"_"+chainId, models.RedisTokenInfo{
-				Token:   token,
-				ChainId: chainId,
-				Logo:    logoUrl,
-			}, 120)
-			if err != nil {
-				log.Logger.Error(err.Error())
-				return false, err
-			}
-		} else {
-			log.Logger.Sugar().Error("UpdateTokenLogo get logo from redis err ", token, chainId, err)
+	redisKey := "token_info:" + chainId + ":" + token
+	redisTokenInfoBytes, err := db.RedisGet(redisKey)
+	log.Logger.Sugar().Info("11111111_1", redisTokenInfoBytes)
+	if len(redisTokenInfoBytes) <= 0 {
+		err = s.CheckTokenInfo(token, chainId)
+		if err != nil {
+			log.Logger.Error(err.Error())
+		}
+		err = db.RedisSet(redisKey, models.RedisTokenInfo{
+			Token:   token,
+			ChainId: chainId,
+			Logo:    logoUrl,
+		}, 120)
+		if err != nil {
+			log.Logger.Error(err.Error())
 			return false, err
 		}
 	} else {
 		redisTokenInfo := models.RedisTokenInfo{}
 		err = json.Unmarshal(redisTokenInfoBytes, &redisTokenInfo)
+		log.Logger.Sugar().Info("11111111_2", redisTokenInfo)
 		if err != nil {
 			log.Logger.Error(err.Error())
 			return false, err
@@ -107,13 +105,8 @@ func (s *TokenLogo) CheckLogoData(token, chainId, logoUrl string) (bool, error) 
 			return false, nil
 		}
 
-		err = db.RedisSet("token_info:"+token+"_"+chainId, models.RedisTokenInfo{
-			Logo:    logoUrl,
-			Token:   redisTokenInfo.Token,
-			Symbol:  redisTokenInfo.Symbol,
-			ChainId: redisTokenInfo.ChainId,
-			Price:   redisTokenInfo.Price,
-		}, 120)
+		redisTokenInfo.Logo = logoUrl
+		err = db.RedisSet(redisKey, redisTokenInfo, 120)
 		if err != nil {
 			log.Logger.Error(err.Error())
 			return true, err

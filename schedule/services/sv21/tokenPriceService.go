@@ -108,14 +108,15 @@ func (s *TokenPrice) GetTestNetTokenPrice(token string) (error, int64) {
 
 // CheckPriceData Saving price data to redis if it has new price
 func (s *TokenPrice) CheckPriceData(token, chainId, price string) (bool, error) {
-	redisTokenInfoBytes, err := db.RedisGet("token_info:" + token + "_" + chainId)
+	redisKey := "token_info:" + chainId + ":" + token
+	redisTokenInfoBytes, err := db.RedisGet(redisKey)
 	log.Logger.Sugar().Info("666666666666", err, len(redisTokenInfoBytes))
 	if len(redisTokenInfoBytes) <= 0 {
 		err = s.CheckTokenInfo(token, chainId)
 		if err != nil {
 			log.Logger.Error(err.Error())
 		}
-		err = db.RedisSet("token_info:"+token+"_"+chainId, models.RedisTokenInfo{
+		err = db.RedisSet(redisKey, models.RedisTokenInfo{
 			Token:   token,
 			ChainId: chainId,
 			Price:   price,
@@ -139,7 +140,7 @@ func (s *TokenPrice) CheckPriceData(token, chainId, price string) (bool, error) 
 
 		redisTokenInfo.Price = price
 		log.Logger.Sugar().Info("888888888888", redisTokenInfo)
-		err = db.RedisSet("token_info:"+token+"_"+chainId, redisTokenInfo, 120)
+		err = db.RedisSet(redisKey, redisTokenInfo, 120)
 		if err != nil {
 			log.Logger.Error(err.Error())
 			return true, err

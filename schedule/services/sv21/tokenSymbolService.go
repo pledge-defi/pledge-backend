@@ -195,13 +195,15 @@ func (s *TokenSymbol) GetContractSymbolOnTestNet(token, network string) (error, 
 
 // CheckSymbolData Saving symbol data to redis if it has new symbol
 func (s *TokenSymbol) CheckSymbolData(token, chainId, symbol string) (bool, error) {
-	redisTokenInfoBytes, err := db.RedisGet("token_info:" + token + "_" + chainId)
+	redisKey := "token_info:" + chainId + ":" + token
+	redisTokenInfoBytes, err := db.RedisGet(redisKey)
+	log.Logger.Sugar().Info("2222222222222", redisTokenInfoBytes)
 	if len(redisTokenInfoBytes) <= 0 {
 		err = s.CheckTokenInfo(token, chainId)
 		if err != nil {
 			log.Logger.Error(err.Error())
 		}
-		err = db.RedisSet("token_info:"+token+"_"+chainId, models.RedisTokenInfo{
+		err = db.RedisSet(redisKey, models.RedisTokenInfo{
 			Token:   token,
 			ChainId: chainId,
 			Symbol:  symbol,
@@ -213,6 +215,7 @@ func (s *TokenSymbol) CheckSymbolData(token, chainId, symbol string) (bool, erro
 	} else {
 		redisTokenInfo := models.RedisTokenInfo{}
 		err = json.Unmarshal(redisTokenInfoBytes, &redisTokenInfo)
+		log.Logger.Sugar().Info("2222222222222_222", redisTokenInfo)
 		if err != nil {
 			log.Logger.Error(err.Error())
 			return false, err
@@ -222,13 +225,8 @@ func (s *TokenSymbol) CheckSymbolData(token, chainId, symbol string) (bool, erro
 			return false, nil
 		}
 
-		err = db.RedisSet("token_info:"+token+"_"+chainId, models.RedisTokenInfo{
-			Logo:    redisTokenInfo.Logo,
-			Token:   redisTokenInfo.Token,
-			Symbol:  symbol,
-			ChainId: redisTokenInfo.ChainId,
-			Price:   redisTokenInfo.Price,
-		}, 120)
+		redisTokenInfo.Symbol = symbol
+		err = db.RedisSet(redisKey, redisTokenInfo, 120)
 		if err != nil {
 			log.Logger.Error(err.Error())
 			return true, err
