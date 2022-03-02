@@ -137,7 +137,6 @@ func (s *TokenPrice) CheckPriceData(token, chainId, price string) (bool, error) 
 		}
 
 		redisTokenInfo.Price = price
-		log.Logger.Sugar().Info("888888888888", redisTokenInfo)
 		err = db.RedisSet(redisKey, redisTokenInfo, 0)
 		if err != nil {
 			log.Logger.Error(err.Error())
