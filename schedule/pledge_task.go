@@ -14,10 +14,10 @@ func main() {
 	db.InitRedis()
 
 	//run pool task v21
-	common.TaskV21()
+	//common.TaskV21()
 
 	//run pool task v22
-	//common.TaskV22()
+	common.TaskV22()
 
 }
 
