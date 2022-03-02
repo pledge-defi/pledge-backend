@@ -77,7 +77,7 @@ func (s *TokenLogo) UpdateTokenLogo() {
 func (s *TokenLogo) CheckLogoData(token, chainId, logoUrl, symbol string) (bool, error) {
 	redisKey := "token_info:" + chainId + ":" + token
 	redisTokenInfoBytes, err := db.RedisGet(redisKey)
-	log.Logger.Sugar().Info("11111111_1", redisTokenInfoBytes)
+	log.Logger.Sugar().Info("11111111_1", redisTokenInfoBytes, redisKey)
 	if len(redisTokenInfoBytes) <= 0 {
 		err = s.CheckTokenInfo(token, chainId)
 		if err != nil {

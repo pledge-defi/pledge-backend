@@ -197,7 +197,7 @@ func (s *TokenSymbol) GetContractSymbolOnTestNet(token, network string) (error, 
 func (s *TokenSymbol) CheckSymbolData(token, chainId, symbol string) (bool, error) {
 	redisKey := "token_info:" + chainId + ":" + token
 	redisTokenInfoBytes, err := db.RedisGet(redisKey)
-	log.Logger.Sugar().Info("2222222222222", redisTokenInfoBytes)
+	log.Logger.Sugar().Info("2222222222222", redisTokenInfoBytes, redisKey)
 	if len(redisTokenInfoBytes) <= 0 {
 		err = s.CheckTokenInfo(token, chainId)
 		if err != nil {
