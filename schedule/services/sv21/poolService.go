@@ -61,6 +61,7 @@ func (s *poolService) UpdatePoolInfo(contractAddress, network, chainId string) {
 		}
 
 		_, borrowToken := models.NewTokenInfo().GetTokenInfo(baseInfo.BorrowToken.String(), chainId)
+		log.Logger.Sugar().Info("-------", borrowToken)
 		_, lendToken := models.NewTokenInfo().GetTokenInfo(baseInfo.LendToken.String(), chainId)
 
 		lendTokenJson, _ := json.Marshal(models.LendToken{

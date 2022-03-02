@@ -26,9 +26,9 @@ func NewTokenInfo() *TokenInfo {
 // GetTokenInfo Get token information by token name
 func (t *TokenInfo) GetTokenInfo(token, chainId string) (error, TokenInfo) {
 
-	redisTokenInfoBytes, err := db.RedisGet("token_info:" + token + "_" + chainId)
-	if err != nil {
-		tokenInfo := TokenInfo{}
+	tokenInfo := TokenInfo{}
+	redisTokenInfoBytes, _ := db.RedisGet("token_info:" + token + "_" + chainId)
+	if len(redisTokenInfoBytes) <= 0 {
 		err := db.Mysql.Table("token_info").Where("token=? and chain_id=?", token, chainId).First(&tokenInfo).Debug().Error
 		if err != nil {
 			if errors.Is(err, gorm.ErrRecordNotFound) {
@@ -40,7 +40,10 @@ func (t *TokenInfo) GetTokenInfo(token, chainId string) (error, TokenInfo) {
 		return nil, tokenInfo
 	} else {
 		redisTokenInfo := RedisTokenInfo{}
-		err = json.Unmarshal(redisTokenInfoBytes, &redisTokenInfo)
+		err := json.Unmarshal(redisTokenInfoBytes, &redisTokenInfo)
+		if err != nil {
+			return errors.New("record Unmarshal err " + err.Error()), tokenInfo
+		}
 		return nil, TokenInfo{
 			Logo:    redisTokenInfo.Logo,
 			Token:   token,
