@@ -3,7 +3,6 @@ package sv21
 import (
 	"encoding/json"
 	"errors"
-	"fmt"
 	"github.com/ethereum/go-ethereum/common"
 	"github.com/ethereum/go-ethereum/ethclient"
 	"gorm.io/gorm"
@@ -129,7 +128,6 @@ func (s *TokenPrice) CheckPriceData(token, chainId, price string) (bool, error) 
 		redisTokenInfo := models.RedisTokenInfo{}
 		err = json.Unmarshal(redisTokenInfoBytes, &redisTokenInfo)
 		log.Logger.Sugar().Info("77777777777", redisTokenInfo)
-		fmt.Println(redisTokenInfo)
 		if err != nil {
 			log.Logger.Error(err.Error())
 			return false, err

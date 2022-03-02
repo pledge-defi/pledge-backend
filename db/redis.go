@@ -129,6 +129,8 @@ func RedisDelete(key string) (bool, error) {
 
 // RedisFlushDB 清空当前DB
 func RedisFlushDB() error {
+
+	log.Logger.Sugar().Info("777777777778888888899999999")
 	conn := RedisConn.Get()
 	defer conn.Close()
 	_, err := conn.Do("flushdb")
