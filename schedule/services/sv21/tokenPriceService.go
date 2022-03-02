@@ -70,6 +70,7 @@ func (s *TokenPrice) UpdateContractPrice() {
 
 // GetMainNetTokenPrice get contract price on main net
 func (s *TokenPrice) GetMainNetTokenPrice(token string) (error, int64) {
+
 	ethereumConn, err := ethclient.Dial(config.Config.MainNet.NetUrl)
 	if nil != err {
 		log.Logger.Error(err.Error())
