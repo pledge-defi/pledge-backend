@@ -2,7 +2,7 @@
 Description=pledge task service
 After=mysql.service
 StartLimitBurst=5
-StartLimitIntervalSec=20 
+StartLimitIntervalSec=30
 [Service]
 Type=simple
 Restart=always
