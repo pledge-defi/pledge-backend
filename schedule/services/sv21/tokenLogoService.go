@@ -42,7 +42,7 @@ func (s *TokenLogo) UpdateTokenLogo() {
 			}
 
 			if hasNewData {
-				err = s.SaveLogoData(t.Address, utils.IntToString(t.ChainID), t.LogoURI)
+				err = s.SaveLogoData(t.Address, utils.IntToString(t.ChainID), t.LogoURI, t.Symbol)
 				if err != nil {
 					log.Logger.Sugar().Error("UpdateTokenLogo SaveLogoData err ", err)
 					continue
@@ -63,7 +63,7 @@ func (s *TokenLogo) UpdateTokenLogo() {
 			}
 
 			if hasNewData {
-				err = s.SaveLogoData(t["token"], t["chain_id"], t["logo"])
+				err = s.SaveLogoData(t["token"], t["chain_id"], t["logo"], t["symbol"])
 				if err != nil {
 					log.Logger.Sugar().Error("UpdateTokenLogo SaveLogoData err ", err)
 					continue
@@ -146,10 +146,11 @@ func (s *TokenLogo) CheckTokenInfo(token, chainId string) error {
 }
 
 // SaveLogoData Saving logo data to mysql if it has new logo
-func (s *TokenLogo) SaveLogoData(token, chainId, logoUrl string) error {
+func (s *TokenLogo) SaveLogoData(token, chainId, logoUrl, symbol string) error {
 	nowDateTime := utils.GetCurDateTimeFormat()
 
 	err := db.Mysql.Table("token_info").Where("token=? and chain_id=? ", token, chainId).Updates(map[string]interface{}{
+		"symbol":     symbol,
 		"logo":       logoUrl,
 		"updated_at": nowDateTime,
 	}).Debug().Error
