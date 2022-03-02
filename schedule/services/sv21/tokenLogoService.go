@@ -77,19 +77,17 @@ func (s *TokenLogo) UpdateTokenLogo() {
 func (s *TokenLogo) CheckLogoData(token, chainId, logoUrl, symbol string) (bool, error) {
 	redisKey := "token_info:" + chainId + ":" + token
 	redisTokenInfoBytes, err := db.RedisGet(redisKey)
-	log.Logger.Sugar().Info("11111111_1", redisTokenInfoBytes, redisKey)
 	if len(redisTokenInfoBytes) <= 0 {
 		err = s.CheckTokenInfo(token, chainId)
 		if err != nil {
 			log.Logger.Error(err.Error())
 		}
-		log.Logger.Sugar().Info("11111111_5")
 		err = db.RedisSet(redisKey, models.RedisTokenInfo{
 			Token:   token,
 			ChainId: chainId,
 			Logo:    logoUrl,
 			Symbol:  symbol,
-		}, 120)
+		}, 0)
 		if err != nil {
 			log.Logger.Error(err.Error())
 			return false, err
@@ -97,7 +95,6 @@ func (s *TokenLogo) CheckLogoData(token, chainId, logoUrl, symbol string) (bool,
 	} else {
 		redisTokenInfo := models.RedisTokenInfo{}
 		err = json.Unmarshal(redisTokenInfoBytes, &redisTokenInfo)
-		log.Logger.Sugar().Info("11111111_2", redisTokenInfo)
 		if err != nil {
 			log.Logger.Error(err.Error())
 			return false, err
@@ -108,7 +105,7 @@ func (s *TokenLogo) CheckLogoData(token, chainId, logoUrl, symbol string) (bool,
 		}
 
 		redisTokenInfo.Logo = logoUrl
-		err = db.RedisSet(redisKey, redisTokenInfo, 120)
+		err = db.RedisSet(redisKey, redisTokenInfo, 0)
 		if err != nil {
 			log.Logger.Error(err.Error())
 			return true, err

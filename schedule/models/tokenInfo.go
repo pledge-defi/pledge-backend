@@ -5,7 +5,6 @@ import (
 	"errors"
 	"gorm.io/gorm"
 	"pledge-backend/db"
-	"pledge-backend/log"
 )
 
 type TokenInfo struct {
@@ -30,7 +29,6 @@ func (t *TokenInfo) GetTokenInfo(token, chainId string) (error, TokenInfo) {
 	tokenInfo := TokenInfo{}
 	redisKey := "token_info:" + chainId + ":" + token
 	redisTokenInfoBytes, _ := db.RedisGet(redisKey)
-	log.Logger.Sugar().Info("d((((((((((((((", redisKey)
 	if len(redisTokenInfoBytes) <= 0 {
 		err := db.Mysql.Table("token_info").Where("token=? and chain_id=?", token, chainId).First(&tokenInfo).Debug().Error
 		if err != nil {

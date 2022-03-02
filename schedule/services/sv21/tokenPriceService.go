@@ -110,18 +110,16 @@ func (s *TokenPrice) GetTestNetTokenPrice(token string) (error, int64) {
 func (s *TokenPrice) CheckPriceData(token, chainId, price string) (bool, error) {
 	redisKey := "token_info:" + chainId + ":" + token
 	redisTokenInfoBytes, err := db.RedisGet(redisKey)
-	log.Logger.Sugar().Info("666666666666", err, len(redisTokenInfoBytes), redisKey)
 	if len(redisTokenInfoBytes) <= 0 {
 		err = s.CheckTokenInfo(token, chainId)
 		if err != nil {
 			log.Logger.Error(err.Error())
 		}
-		log.Logger.Sugar().Info("666666666666888999111", err, len(redisTokenInfoBytes), redisKey)
 		err = db.RedisSet(redisKey, models.RedisTokenInfo{
 			Token:   token,
 			ChainId: chainId,
 			Price:   price,
-		}, 120)
+		}, 0)
 		if err != nil {
 			log.Logger.Error(err.Error())
 			return false, err
@@ -129,7 +127,6 @@ func (s *TokenPrice) CheckPriceData(token, chainId, price string) (bool, error) 
 	} else {
 		redisTokenInfo := models.RedisTokenInfo{}
 		err = json.Unmarshal(redisTokenInfoBytes, &redisTokenInfo)
-		log.Logger.Sugar().Info("77777777777", redisTokenInfo)
 		if err != nil {
 			log.Logger.Error(err.Error())
 			return false, err
@@ -141,7 +138,7 @@ func (s *TokenPrice) CheckPriceData(token, chainId, price string) (bool, error) 
 
 		redisTokenInfo.Price = price
 		log.Logger.Sugar().Info("888888888888", redisTokenInfo)
-		err = db.RedisSet(redisKey, redisTokenInfo, 120)
+		err = db.RedisSet(redisKey, redisTokenInfo, 0)
 		if err != nil {
 			log.Logger.Error(err.Error())
 			return true, err
