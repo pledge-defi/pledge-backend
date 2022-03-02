@@ -111,23 +111,18 @@ func (s *TokenPrice) GetTestNetTokenPrice(token string) (error, int64) {
 func (s *TokenPrice) CheckPriceData(token, chainId, price string) (bool, error) {
 	redisTokenInfoBytes, err := db.RedisGet("token_info:" + token + "_" + chainId)
 	fmt.Println("----__________----------______", err)
-	if err != nil {
-		if err.Error() == "redigo: nil returned" {
-			err = s.CheckTokenInfo(token, chainId)
-			if err != nil {
-				log.Logger.Error(err.Error())
-			}
-			err = db.RedisSet("token_info:"+token+"_"+chainId, models.RedisTokenInfo{
-				Token:   token,
-				ChainId: chainId,
-				Price:   price,
-			}, 120)
-			if err != nil {
-				log.Logger.Error(err.Error())
-				return false, err
-			}
-		} else {
-			log.Logger.Sugar().Error("UpdateContractSymbol get symbol from redis err ", token, chainId, err)
+	if len(redisTokenInfoBytes) <= 0 {
+		err = s.CheckTokenInfo(token, chainId)
+		if err != nil {
+			log.Logger.Error(err.Error())
+		}
+		err = db.RedisSet("token_info:"+token+"_"+chainId, models.RedisTokenInfo{
+			Token:   token,
+			ChainId: chainId,
+			Price:   price,
+		}, 120)
+		if err != nil {
+			log.Logger.Error(err.Error())
 			return false, err
 		}
 	} else {

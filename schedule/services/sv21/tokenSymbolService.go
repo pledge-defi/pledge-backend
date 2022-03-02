@@ -91,7 +91,7 @@ func (s *TokenSymbol) GetRemoteAbiFileByToken(token, chainId string) error {
 
 	if abiJson.Status != "1" {
 		log.Logger.Error("get remote abi file failed: status 0 ")
-		return errors.New("get remote abi file failed: status 0")
+		return errors.New("get remote abi file failed: status 0 ")
 	}
 
 	abiJsonBytes, err := json.MarshalIndent(abiJson.Result, "", "\t")
@@ -196,23 +196,18 @@ func (s *TokenSymbol) GetContractSymbolOnTestNet(token, network string) (error, 
 // CheckSymbolData Saving symbol data to redis if it has new symbol
 func (s *TokenSymbol) CheckSymbolData(token, chainId, symbol string) (bool, error) {
 	redisTokenInfoBytes, err := db.RedisGet("token_info:" + token + "_" + chainId)
-	if err != nil {
-		if err.Error() == "redigo: nil returned" {
-			err = s.CheckTokenInfo(token, chainId)
-			if err != nil {
-				log.Logger.Error(err.Error())
-			}
-			err = db.RedisSet("token_info:"+token+"_"+chainId, models.RedisTokenInfo{
-				Token:   token,
-				ChainId: chainId,
-				Symbol:  symbol,
-			}, 120)
-			if err != nil {
-				log.Logger.Error(err.Error())
-				return false, err
-			}
-		} else {
-			log.Logger.Sugar().Error("UpdateContractSymbol get symbol from redis err ", token, chainId, err)
+	if len(redisTokenInfoBytes) <= 0 {
+		err = s.CheckTokenInfo(token, chainId)
+		if err != nil {
+			log.Logger.Error(err.Error())
+		}
+		err = db.RedisSet("token_info:"+token+"_"+chainId, models.RedisTokenInfo{
+			Token:   token,
+			ChainId: chainId,
+			Symbol:  symbol,
+		}, 120)
+		if err != nil {
+			log.Logger.Error(err.Error())
 			return false, err
 		}
 	} else {
