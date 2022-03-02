@@ -61,7 +61,7 @@ type MainNetConfig struct {
 type RedisConfig struct {
 	Address     string `toml:"address"`
 	Port        string `toml:"port"`
-	Db          string `toml:"db"`
+	Db          int    `toml:"db"`
 	Password    string `toml:"password"`
 	MaxIdle     int    `toml:"max_idle"`
 	MaxActive   int    `toml:"max_active"`

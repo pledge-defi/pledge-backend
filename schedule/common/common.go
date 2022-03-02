@@ -10,7 +10,10 @@ import (
 func TaskV21() {
 
 	// flush redis db
-	db.RedisFlushDB()
+	err := db.RedisFlushDB()
+	if err != nil {
+		panic("clear redis error " + err.Error())
+	}
 
 	// Init all the jobs
 	sv21.NewPool().UpdateAllPoolInfo()
@@ -29,7 +32,10 @@ func TaskV21() {
 func TaskV22() {
 
 	// flush redis db
-	db.RedisFlushDB()
+	err := db.RedisFlushDB()
+	if err != nil {
+		panic("clear redis error " + err.Error())
+	}
 
 	//Init all the jobs
 	sv22.NewPool().UpdateAllPoolInfo()

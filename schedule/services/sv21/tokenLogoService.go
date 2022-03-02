@@ -2,8 +2,6 @@ package sv21
 
 import (
 	"encoding/json"
-	"errors"
-	"gorm.io/gorm"
 	"pledge-backend/config"
 	"pledge-backend/db"
 	"pledge-backend/log"
@@ -21,8 +19,6 @@ func NewTokenLogo() *TokenLogo {
 
 func (s *TokenLogo) UpdateTokenLogo() {
 
-	nowDateTime := utils.GetCurDateTimeFormat()
-
 	// update remote logo
 	res, err := utils.HttpGet(config.Config.Token.LogoUrl)
 	if err != nil {
@@ -30,36 +26,25 @@ func (s *TokenLogo) UpdateTokenLogo() {
 	} else {
 		tokenLogoRemote := models.TokenLogoRemote{}
 
-		json.Unmarshal([]byte(res), &tokenLogoRemote)
+		err = json.Unmarshal(res, &tokenLogoRemote)
+		if err != nil {
+			log.Logger.Sugar().Error("UpdateTokenLogo json.Unmarshal err ", err)
+			return
+		}
 		for _, t := range tokenLogoRemote.Tokens {
-			var tokenInfo models.TokenInfo
-			err = db.Mysql.Table("token_info").Where("token=?", t.Address).First(&tokenInfo).Debug().Error
-			if errors.Is(err, gorm.ErrRecordNotFound) {
-				err = db.Mysql.Table("token_info").Create(&models.TokenInfo{
-					Token:     t.Address,
-					Logo:      t.LogoURI,
-					Symbol:    t.Symbol,
-					ChainId:   utils.IntToString(t.ChainID),
-					CreatedAt: nowDateTime,
-					UpdatedAt: nowDateTime,
-				}).Debug().Error
-				if err != nil {
-					log.Logger.Sugar().Error("UpdateTokenLogo token_info create err ", err)
-					continue
-				}
-			} else {
-				log.Logger.Sugar().Error("UpdateTokenLogo token_info find err ", err)
+
+			hasNewData, err := s.CheckLogoData(t.Address, utils.IntToString(t.ChainID), t.LogoURI)
+			if err != nil {
+				log.Logger.Sugar().Error("UpdateTokenLogo CheckLogoData err ", err)
 				continue
 			}
 
-			err = db.Mysql.Table("token_info").Where("token=? and chain_id=? ", t.Address, t.ChainID).Updates(map[string]interface{}{
-				"logo":       t.LogoURI,
-				"symbol":     t.Symbol,
-				"updated_at": nowDateTime,
-			}).Debug().Error
-			if err != nil {
-				log.Logger.Sugar().Error("UpdateTokenLogo token_info update err ", err)
-				continue
+			if hasNewData {
+				err = s.SaveLogoData(t.Address, utils.IntToString(t.ChainID), t.LogoURI)
+				if err != nil {
+					log.Logger.Sugar().Error("UpdateTokenLogo SaveLogoData err ", err)
+					continue
+				}
 			}
 		}
 	}
@@ -70,34 +55,81 @@ func (s *TokenLogo) UpdateTokenLogo() {
 			if t["token"] == "" {
 				continue
 			}
-			err = db.Mysql.Table("token_info").Where("chain_id=? and token=?", t["chain_id"], t["token"]).First(&models.TokenInfo{}).Debug().Error
-			if errors.Is(err, gorm.ErrRecordNotFound) {
-				nowDateTime := utils.GetCurDateTimeFormat()
-				err = db.Mysql.Table("token_info").Create(&models.TokenInfo{
-					Token:     t["token"],
-					Symbol:    t["symbol"],
-					ChainId:   t["chain_id"],
-					Logo:      t["logo"],
-					CreatedAt: nowDateTime,
-					UpdatedAt: nowDateTime,
-				}).Debug().Error
+			hasNewData, err := s.CheckLogoData(t["token"], t["chain_id"], t["logo"])
+			if err != nil {
+				continue
+			}
+
+			if hasNewData {
+				err = s.SaveLogoData(t["token"], t["chain_id"], t["logo"])
 				if err != nil {
-					log.Logger.Sugar().Error("UpdateTokenLogo token_info create err ", err)
+					log.Logger.Sugar().Error("UpdateTokenLogo SaveLogoData err ", err)
 					continue
 				}
-			} else {
-				err = db.Mysql.Table("token_info").Where("chain_id=? and token=?", t["chain_id"], t["token"]).Updates(map[string]interface{}{
-					"logo":       t["logo"],
-					"symbol":     t["symbol"],
-					"updated_at": nowDateTime,
-				}).Debug().Error
-				if err != nil {
-					log.Logger.Sugar().Error("UpdateTokenLogo token_info update err ", err)
-				}
-				continue
 			}
 		}
 	}
+}
+
+// CheckLogoData Saving logo data to redis if it has new logo
+func (s *TokenLogo) CheckLogoData(token, chainId, logoUrl string) (bool, error) {
+	redisTokenInfoBytes, err := db.RedisGet("token_info:" + token + "_" + chainId)
+	if err != nil {
+		if err.Error() == "redigo: nil returned" {
+			err = db.RedisSet("token_info:"+token+"_"+chainId, models.RedisTokenInfo{
+				Token:   token,
+				ChainId: chainId,
+				Logo:    logoUrl,
+			}, 120)
+			if err != nil {
+				log.Logger.Error(err.Error())
+				return false, err
+			}
+		} else {
+			log.Logger.Sugar().Error("UpdateTokenLogo get logo from redis err ", token, chainId, err)
+			return false, err
+		}
+	} else {
+		redisTokenInfo := models.RedisTokenInfo{}
+		err = json.Unmarshal(redisTokenInfoBytes, &redisTokenInfo)
+		if err != nil {
+			log.Logger.Error(err.Error())
+			return false, err
+		}
+
+		if redisTokenInfo.Logo == logoUrl {
+			return false, nil
+		}
+
+		err = db.RedisSet("token_info:"+token+"_"+chainId, models.RedisTokenInfo{
+			Logo:    logoUrl,
+			Token:   redisTokenInfo.Token,
+			Symbol:  redisTokenInfo.Symbol,
+			ChainId: redisTokenInfo.ChainId,
+			Price:   redisTokenInfo.Price,
+		}, 120)
+		if err != nil {
+			log.Logger.Error(err.Error())
+			return true, err
+		}
+	}
+	return true, nil
+}
+
+// SaveLogoData Saving logo data to mysql if it has new logo
+func (s *TokenLogo) SaveLogoData(token, chainId, logoUrl string) error {
+	nowDateTime := utils.GetCurDateTimeFormat()
+
+	err := db.Mysql.Table("token_info").Where("token=? and chain_id=? ", token, chainId).Updates(map[string]interface{}{
+		"logo":       logoUrl,
+		"updated_at": nowDateTime,
+	}).Debug().Error
+	if err != nil {
+		log.Logger.Sugar().Error("UpdateTokenLogo SaveLogoData err ", err)
+		return err
+	}
+
+	return nil
 }
 
 func GetBaseUrl() string {
@@ -114,127 +146,127 @@ func GetBaseUrl() string {
 
 var BaseUrl = GetBaseUrl()
 
-var LocalTokenLogo map[string]map[string]map[string]string = map[string]map[string]map[string]string{
-	"BNB": map[string]map[string]string{
-		"test_net": map[string]string{
+var LocalTokenLogo = map[string]map[string]map[string]string{
+	"BNB": {
+		"test_net": {
 			"chain_id": "97",
 			"token":    "0x0000000000000000000000000000000000000000",
 			"symbol":   "BNB",
 			"logo":     BaseUrl + "storage/img/BNB.png",
 		},
-		"main_net": map[string]string{
+		"main_net": {
 			"chain_id": "56",
 			"token":    "0x0000000000000000000000000000000000000000",
 			"symbol":   "BNB",
 			"logo":     BaseUrl + "storage/img/BNB.png",
 		},
 	},
-	"BTC": map[string]map[string]string{
-		"test_net": map[string]string{
+	"BTC": {
+		"test_net": {
 			"chain_id": "97",
 			"token":    "0xB5514a4FA9dDBb48C3DE215Bc9e52d9fCe2D8658",
 			"symbol":   "BTC",
 			"logo":     BaseUrl + "storage/img/BTC.png",
 		},
-		"main_net": map[string]string{
+		"main_net": {
 			"chain_id": "56",
 			"token":    "0x7130d2A12B9BCbFAe4f2634d864A1Ee1Ce3Ead9c",
 			"symbol":   "BTC",
 			"logo":     BaseUrl + "storage/img/BTC.png",
 		},
 	},
-	"BTCB": map[string]map[string]string{
-		"test_net": map[string]string{
+	"BTCB": {
+		"test_net": {
 			"chain_id": "97",
 			"token":    "0xB5514a4FA9dDBb48C3DE215Bc9e52d9fCe2D8658",
 			"symbol":   "BTC",
 			"logo":     BaseUrl + "storage/img/BTC.png",
 		},
-		"main_net": map[string]string{
+		"main_net": {
 			"chain_id": "56",
 			"token":    "0x7130d2A12B9BCbFAe4f2634d864A1Ee1Ce3Ead9c",
 			"symbol":   "BTC",
 			"logo":     BaseUrl + "storage/img/BTC.png",
 		},
 	},
-	"BUSD": map[string]map[string]string{
-		"test_net": map[string]string{
+	"BUSD": {
+		"test_net": {
 			"chain_id": "97",
 			"token":    "0xE676Dcd74f44023b95E0E2C6436C97991A7497DA",
 			"symbol":   "BUSD",
 			"logo":     BaseUrl + "storage/img/BUSD.png",
 		},
-		"main_net": map[string]string{
+		"main_net": {
 			"chain_id": "56",
 			"token":    "0xe9e7CEA3DedcA5984780Bafc599bD69ADd087D56",
 			"symbol":   "BUSD",
 			"logo":     BaseUrl + "storage/img/BUSD.png",
 		},
 	},
-	"DAI": map[string]map[string]string{
-		"test_net": map[string]string{
+	"DAI": {
+		"test_net": {
 			"chain_id": "97",
 			"token":    "0x490BC3FCc845d37C1686044Cd2d6589585DE9B8B",
 			"symbol":   "DAI",
 			"logo":     BaseUrl + "storage/img/DAI.png",
 		},
-		"main_net": map[string]string{
+		"main_net": {
 			"chain_id": "56",
 			"token":    "0x1AF3F329e8BE154074D8769D1FFa4eE058B1DBc3",
 			"symbol":   "DAI",
 			"logo":     BaseUrl + "storage/img/DAI.png",
 		},
 	},
-	"ETH": map[string]map[string]string{
-		"test_net": map[string]string{
+	"ETH": {
+		"test_net": {
 			"chain_id": "97",
 			"token":    "",
 			"symbol":   "ETH",
 			"logo":     BaseUrl + "storage/img/ETH.png",
 		},
-		"main_net": map[string]string{
+		"main_net": {
 			"chain_id": "56",
 			"token":    "0x2170ed0880ac9a755fd29b2688956bd959f933f8",
 			"symbol":   "ETH",
 			"logo":     BaseUrl + "storage/img/ETH.png",
 		},
 	},
-	"USDT": map[string]map[string]string{
-		"test_net": map[string]string{
+	"USDT": {
+		"test_net": {
 			"chain_id": "97",
 			"token":    "",
 			"symbol":   "USDT",
 			"logo":     BaseUrl + "storage/img/USDT.png",
 		},
-		"main_net": map[string]string{
+		"main_net": {
 			"chain_id": "56",
 			"token":    "0x55d398326f99059ff775485246999027b3197955",
 			"symbol":   "USDT",
 			"logo":     BaseUrl + "storage/img/USDT.png",
 		},
 	},
-	"CAKE": map[string]map[string]string{
-		"test_net": map[string]string{
+	"CAKE": {
+		"test_net": {
 			"chain_id": "97",
 			"token":    "0xEAEd08168a2D34Ae2B9ea1c1f920E0BC00F9fA67",
 			"symbol":   "CAKE",
 			"logo":     BaseUrl + "storage/img/CAKE.png",
 		},
-		"main_net": map[string]string{
+		"main_net": {
 			"chain_id": "56",
 			"token":    "0x0e09fabb73bd3ade0a17ecc321fd13a19e81ce82",
 			"symbol":   "CAKE",
 			"logo":     BaseUrl + "storage/img/CAKE.png",
 		},
 	},
-	"PLGR": map[string]map[string]string{
-		"test_net": map[string]string{
+	"PLGR": {
+		"test_net": {
 			"chain_id": "97",
 			"token":    "",
 			"symbol":   "PLGR",
 			"logo":     BaseUrl + "storage/img/PLGR.png",
 		},
-		"main_net": map[string]string{
+		"main_net": {
 			"chain_id": "56",
 			"token":    "0x6Aa91CbfE045f9D154050226fCc830ddbA886CED",
 			"symbol":   "PLGR",

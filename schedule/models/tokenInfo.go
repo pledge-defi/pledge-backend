@@ -1,6 +1,7 @@
 package models
 
 import (
+	"encoding/json"
 	"errors"
 	"gorm.io/gorm"
 	"pledge-backend/db"
@@ -22,16 +23,31 @@ func NewTokenInfo() *TokenInfo {
 	return &TokenInfo{}
 }
 
-// GetBYName Get token information by token name
-func (t *TokenInfo) GetBYName(token, chainId string) (error, TokenInfo) {
-	tokenInfo := TokenInfo{}
-	err := db.Mysql.Table("token_info").Where("token=? and chain_id=?", token, chainId).First(&tokenInfo).Debug().Error
+// GetTokenInfo Get token information by token name
+func (t *TokenInfo) GetTokenInfo(token, chainId string) (error, TokenInfo) {
+
+	redisTokenInfoBytes, err := db.RedisGet("token_info:" + token + "_" + chainId)
 	if err != nil {
-		if errors.Is(err, gorm.ErrRecordNotFound) {
-			return nil, tokenInfo
-		} else {
-			return errors.New("record select err " + err.Error()), tokenInfo
+		tokenInfo := TokenInfo{}
+		err := db.Mysql.Table("token_info").Where("token=? and chain_id=?", token, chainId).First(&tokenInfo).Debug().Error
+		if err != nil {
+			if errors.Is(err, gorm.ErrRecordNotFound) {
+				return nil, tokenInfo
+			} else {
+				return errors.New("record select err " + err.Error()), tokenInfo
+			}
+		}
+		return nil, tokenInfo
+	} else {
+		redisTokenInfo := RedisTokenInfo{}
+		err = json.Unmarshal(redisTokenInfoBytes, &redisTokenInfo)
+		return nil, TokenInfo{
+			Logo:    redisTokenInfo.Logo,
+			Token:   token,
+			Symbol:  redisTokenInfo.Symbol,
+			ChainId: chainId,
+			Price:   redisTokenInfo.Price,
 		}
 	}
-	return nil, tokenInfo
+
 }

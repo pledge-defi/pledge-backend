@@ -26,9 +26,15 @@ func InitRedis() *redis.Pool {
 				return nil, err
 			}
 			// 验证密码
-			c.Do("auth", redisConf.Password)
+			_, err = c.Do("auth", redisConf.Password)
+			if err != nil {
+				panic("redis auth err " + err.Error())
+			}
 			// 选择db
-			c.Do("select", redisConf.Db)
+			_, err = c.Do("select", redisConf.Db)
+			if err != nil {
+				panic("redis select db err " + err.Error())
+			}
 			return c, nil
 		},
 	}
@@ -121,17 +127,6 @@ func RedisDelete(key string) (bool, error) {
 	return redis.Bool(conn.Do("del", key))
 }
 
-// RedisGetHash 获取Hash类型
-func RedisGetHash(key string) (map[string]string, error) {
-	conn := RedisConn.Get()
-	defer conn.Close()
-	reply, err := redis.StringMap(conn.Do("hgetall", key))
-	if err != nil {
-		return nil, err
-	}
-	return reply, nil
-}
-
 // RedisFlushDB 清空当前DB
 func RedisFlushDB() error {
 	conn := RedisConn.Get()
@@ -176,6 +171,17 @@ func RedisSetHash(key string, data map[string]string, time interface{}) error {
 		}
 	}
 	return nil
+}
+
+// RedisGetHash 获取Hash类型
+func RedisGetHash(key string) (map[string]string, error) {
+	conn := RedisConn.Get()
+	defer conn.Close()
+	reply, err := redis.StringMap(conn.Do("hgetall", key))
+	if err != nil {
+		return nil, err
+	}
+	return reply, nil
 }
 
 // RedisDelHash 删除Hash

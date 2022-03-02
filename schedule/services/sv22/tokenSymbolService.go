@@ -15,7 +15,6 @@ import (
 	"pledge-backend/schedule/models"
 	"pledge-backend/utils"
 	"strings"
-	"time"
 )
 
 type TokenSymbol struct{}
@@ -27,7 +26,6 @@ func NewTokenSymbol() *TokenSymbol {
 // UpdateContractSymbol get contract symbol
 func (s *TokenSymbol) UpdateContractSymbol() {
 	var tokens []models.TokenInfo
-	nowDateTime := utils.GetCurDateTimeFormat()
 	db.Mysql.Table("token_info").Find(&tokens)
 	for _, t := range tokens {
 		if t.Token == "" {
@@ -55,17 +53,20 @@ func (s *TokenSymbol) UpdateContractSymbol() {
 			log.Logger.Sugar().Error("UpdateContractSymbol err", t.Symbol, t.ChainId, err)
 			continue
 		}
-		err = db.Mysql.Table("token_info").Where("id=?", t.Id).Updates(map[string]interface{}{
-			"symbol":     symbol,
-			"updated_at": nowDateTime,
-		}).Debug().Error
+
+		hasNewData, err := s.CheckSymbolData(t.Token, t.ChainId, symbol)
 		if err != nil {
-			log.Logger.Sugar().Error("UpdateContractSymbol err", t.Symbol, t.ChainId, err)
+			log.Logger.Sugar().Error("UpdateContractSymbol CheckSymbolData err ", err)
 			continue
 		}
 
-		// Avoid blockchain servers treating programs as crawlers
-		time.Sleep(time.Second)
+		if hasNewData {
+			err = s.SaveSymbolData(t.Token, t.ChainId, symbol)
+			if err != nil {
+				log.Logger.Sugar().Error("UpdateContractSymbol SaveSymbolData err ", err)
+				continue
+			}
+		}
 	}
 }
 
@@ -189,4 +190,65 @@ func (s *TokenSymbol) GetContractSymbolOnTestNet(token, network string) (error, 
 	}
 
 	return nil, res[0].(string)
+}
+
+// CheckSymbolData Saving symbol data to redis if it has new symbol
+func (s *TokenSymbol) CheckSymbolData(token, chainId, symbol string) (bool, error) {
+	redisTokenInfoBytes, err := db.RedisGet("token_info:" + token + "_" + chainId)
+	if err != nil {
+		if err.Error() == "redigo: nil returned" {
+			err = db.RedisSet("token_info:"+token+"_"+chainId, models.RedisTokenInfo{
+				Token:   token,
+				ChainId: chainId,
+				Symbol:  symbol,
+			}, 120)
+			if err != nil {
+				log.Logger.Error(err.Error())
+				return false, err
+			}
+		} else {
+			log.Logger.Sugar().Error("UpdateContractSymbol get symbol from redis err ", token, chainId, err)
+			return false, err
+		}
+	} else {
+		redisTokenInfo := models.RedisTokenInfo{}
+		err = json.Unmarshal(redisTokenInfoBytes, &redisTokenInfo)
+		if err != nil {
+			log.Logger.Error(err.Error())
+			return false, err
+		}
+
+		if redisTokenInfo.Symbol == symbol {
+			return false, nil
+		}
+
+		err = db.RedisSet("token_info:"+token+"_"+chainId, models.RedisTokenInfo{
+			Logo:    redisTokenInfo.Logo,
+			Token:   redisTokenInfo.Token,
+			Symbol:  symbol,
+			ChainId: redisTokenInfo.ChainId,
+			Price:   redisTokenInfo.Price,
+		}, 120)
+		if err != nil {
+			log.Logger.Error(err.Error())
+			return true, err
+		}
+	}
+	return true, nil
+}
+
+// SaveSymbolData Saving symbol data to mysql if it has new symbol
+func (s *TokenSymbol) SaveSymbolData(token, chainId, symbol string) error {
+	nowDateTime := utils.GetCurDateTimeFormat()
+
+	err := db.Mysql.Table("token_info").Where("token=? and chain_id=? ", token, chainId).Updates(map[string]interface{}{
+		"symbol":     symbol,
+		"updated_at": nowDateTime,
+	}).Debug().Error
+	if err != nil {
+		log.Logger.Sugar().Error("UpdateContractSymbol SaveSymbolData err ", err)
+		return err
+	}
+
+	return nil
 }

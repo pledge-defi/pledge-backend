@@ -1,6 +1,7 @@
 package sv22
 
 import (
+	"encoding/json"
 	"errors"
 	"github.com/ethereum/go-ethereum/common"
 	"github.com/ethereum/go-ethereum/ethclient"
@@ -21,7 +22,6 @@ func NewTokenPrice() *TokenPrice {
 // UpdateContractPrice update contract price
 func (s *TokenPrice) UpdateContractPrice() {
 	var tokens []models.TokenInfo
-	nowDateTime := utils.GetCurDateTimeFormat()
 	db.Mysql.Table("token_info").Find(&tokens)
 	for _, t := range tokens {
 		if t.Token == "" {
@@ -43,27 +43,18 @@ func (s *TokenPrice) UpdateContractPrice() {
 			continue
 		}
 
-		priceRedis, err := db.RedisGetInt64("token_info:price:" + t.Token + "_" + t.ChainId)
+		hasNewData, err := s.CheckPriceData(t.Token, t.ChainId, utils.Int64ToString(price))
 		if err != nil {
-			if err.Error() == "redigo: nil returned" {
-				err = db.RedisSetInt64("token_info:price:"+t.Token+"_"+t.ChainId, price, 120)
-			} else {
-				log.Logger.Sugar().Error("UpdateContractPrice get price from redis err ", t.Symbol, t.ChainId, err)
-			}
-		} else {
-			if priceRedis == price {
-				continue
-			}
-			err = db.RedisSetInt64("token_info:price:"+t.Token+"_"+t.ChainId, price, 120)
+			log.Logger.Sugar().Error("UpdateContractPrice CheckPriceData err ", err)
+			continue
 		}
 
-		err = db.Mysql.Table("token_info").Where("id=?", t.Id).Updates(map[string]interface{}{
-			"price":      price,
-			"updated_at": nowDateTime,
-		}).Debug().Error
-		if err != nil {
-			log.Logger.Sugar().Error("UpdateContractPrice err ", t.Symbol, t.ChainId, err)
-			continue
+		if hasNewData {
+			err = s.SavePriceData(t.Token, t.ChainId, utils.Int64ToString(price))
+			if err != nil {
+				log.Logger.Sugar().Error("UpdateContractPrice SavePriceData err ", err)
+				continue
+			}
 		}
 	}
 }
@@ -112,4 +103,66 @@ func (s *TokenPrice) GetTestNetTokenPrice(token string) (error, int64) {
 	}
 
 	return nil, price.Int64()
+}
+
+// CheckPriceData Saving price data to redis if it has new price
+func (s *TokenPrice) CheckPriceData(token, chainId, price string) (bool, error) {
+	redisTokenInfoBytes, err := db.RedisGet("token_info:" + token + "_" + chainId)
+	if err != nil {
+		if err.Error() == "redigo: nil returned" {
+			err = db.RedisSet("token_info:"+token+"_"+chainId, models.RedisTokenInfo{
+				Token:   token,
+				ChainId: chainId,
+				Price:   price,
+			}, 120)
+			if err != nil {
+				log.Logger.Error(err.Error())
+				return false, err
+			}
+		} else {
+			log.Logger.Sugar().Error("UpdateContractSymbol get symbol from redis err ", token, chainId, err)
+			return false, err
+		}
+	} else {
+		redisTokenInfo := models.RedisTokenInfo{}
+		err = json.Unmarshal(redisTokenInfoBytes, &redisTokenInfo)
+		if err != nil {
+			log.Logger.Error(err.Error())
+			return false, err
+		}
+
+		if redisTokenInfo.Price == price {
+			return false, nil
+		}
+
+		err = db.RedisSet("token_info:"+token+"_"+chainId, models.RedisTokenInfo{
+			Logo:    redisTokenInfo.Logo,
+			Token:   redisTokenInfo.Token,
+			Symbol:  redisTokenInfo.Symbol,
+			ChainId: redisTokenInfo.ChainId,
+			Price:   price,
+		}, 120)
+		if err != nil {
+			log.Logger.Error(err.Error())
+			return true, err
+		}
+	}
+	return true, nil
+}
+
+// SavePriceData Saving price data to mysql if it has new price
+func (s *TokenPrice) SavePriceData(token, chainId, price string) error {
+
+	nowDateTime := utils.GetCurDateTimeFormat()
+
+	err := db.Mysql.Table("token_info").Where("token=? and chain_id=? ", token, chainId).Updates(map[string]interface{}{
+		"price":      price,
+		"updated_at": nowDateTime,
+	}).Debug().Error
+	if err != nil {
+		log.Logger.Sugar().Error("UpdateContractPrice SavePriceData err ", err)
+		return err
+	}
+
+	return nil
 }
