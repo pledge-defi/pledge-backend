@@ -203,6 +203,7 @@ func (s *TokenSymbol) CheckSymbolData(token, chainId, symbol string) (bool, erro
 		if err != nil {
 			log.Logger.Error(err.Error())
 		}
+		log.Logger.Sugar().Info("2222222222222_dddddd", redisTokenInfoBytes)
 		err = db.RedisSet(redisKey, models.RedisTokenInfo{
 			Token:   token,
 			ChainId: chainId,
