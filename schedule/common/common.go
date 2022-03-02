@@ -46,7 +46,7 @@ func TaskV22() {
 	//run pool task v22
 	gocron.Every(25).Seconds().Do(sv22.NewPool().UpdateAllPoolInfo)
 	gocron.Every(25).Seconds().Do(sv22.NewTokenPrice().UpdateContractPrice)
-	gocron.Every(2).Hours().Do(sv22.NewTokenSymbol().UpdateContractSymbol)
-	gocron.Every(2).Hours().Do(sv22.NewTokenLogo().UpdateTokenLogo)
+	gocron.Every(5).Minutes().Do(sv22.NewTokenSymbol().UpdateContractSymbol)
+	gocron.Every(5).Minutes().Do(sv22.NewTokenLogo().UpdateTokenLogo)
 	<-gocron.Start() // Start all the pending jobs
 }

@@ -3,6 +3,7 @@ package sv22
 import (
 	"encoding/json"
 	"errors"
+	"fmt"
 	"github.com/ethereum/go-ethereum/common"
 	"github.com/ethereum/go-ethereum/ethclient"
 	"pledge-backend/config"
@@ -108,6 +109,7 @@ func (s *TokenPrice) GetTestNetTokenPrice(token string) (error, int64) {
 // CheckPriceData Saving price data to redis if it has new price
 func (s *TokenPrice) CheckPriceData(token, chainId, price string) (bool, error) {
 	redisTokenInfoBytes, err := db.RedisGet("token_info:" + token + "_" + chainId)
+	fmt.Println("----__________----------______", err)
 	if err != nil {
 		if err.Error() == "redigo: nil returned" {
 			err = db.RedisSet("token_info:"+token+"_"+chainId, models.RedisTokenInfo{
@@ -126,6 +128,8 @@ func (s *TokenPrice) CheckPriceData(token, chainId, price string) (bool, error) 
 	} else {
 		redisTokenInfo := models.RedisTokenInfo{}
 		err = json.Unmarshal(redisTokenInfoBytes, &redisTokenInfo)
+		fmt.Println("----__________----------")
+		fmt.Println(redisTokenInfo)
 		if err != nil {
 			log.Logger.Error(err.Error())
 			return false, err
@@ -149,6 +153,51 @@ func (s *TokenPrice) CheckPriceData(token, chainId, price string) (bool, error) 
 	}
 	return true, nil
 }
+
+// CheckTokenInfo  Checking token information in mysql
+//func (s *TokenPrice) CheckTokenInfo(token, chainId string) error {
+//	redisTokenInfoBytes, err := db.RedisGet("token_info:" + token + "_" + chainId)
+//	if err != nil {
+//		if err.Error() == "redigo: nil returned" {
+//			err = db.RedisSet("token_info:"+token+"_"+chainId, models.RedisTokenInfo{
+//				Token:   token,
+//				ChainId: chainId,
+//				Price:   price,
+//			}, 120)
+//			if err != nil {
+//				log.Logger.Error(err.Error())
+//				return false, err
+//			}
+//		} else {
+//			log.Logger.Sugar().Error("UpdateContractSymbol get symbol from redis err ", token, chainId, err)
+//			return false, err
+//		}
+//	} else {
+//		redisTokenInfo := models.RedisTokenInfo{}
+//		err = json.Unmarshal(redisTokenInfoBytes, &redisTokenInfo)
+//		if err != nil {
+//			log.Logger.Error(err.Error())
+//			return false, err
+//		}
+//
+//		if redisTokenInfo.Price == price {
+//			return false, nil
+//		}
+//
+//		err = db.RedisSet("token_info:"+token+"_"+chainId, models.RedisTokenInfo{
+//			Logo:    redisTokenInfo.Logo,
+//			Token:   redisTokenInfo.Token,
+//			Symbol:  redisTokenInfo.Symbol,
+//			ChainId: redisTokenInfo.ChainId,
+//			Price:   price,
+//		}, 120)
+//		if err != nil {
+//			log.Logger.Error(err.Error())
+//			return true, err
+//		}
+//	}
+//	return true, nil
+//}
 
 // SavePriceData Saving price data to mysql if it has new price
 func (s *TokenPrice) SavePriceData(token, chainId, price string) error {

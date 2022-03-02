@@ -2,6 +2,8 @@ package sv21
 
 import (
 	"encoding/json"
+	"errors"
+	"gorm.io/gorm"
 	"pledge-backend/config"
 	"pledge-backend/db"
 	"pledge-backend/log"
@@ -76,6 +78,10 @@ func (s *TokenLogo) CheckLogoData(token, chainId, logoUrl string) (bool, error) 
 	redisTokenInfoBytes, err := db.RedisGet("token_info:" + token + "_" + chainId)
 	if err != nil {
 		if err.Error() == "redigo: nil returned" {
+			err = s.CheckTokenInfo(token, chainId)
+			if err != nil {
+				log.Logger.Error(err.Error())
+			}
 			err = db.RedisSet("token_info:"+token+"_"+chainId, models.RedisTokenInfo{
 				Token:   token,
 				ChainId: chainId,
@@ -114,6 +120,29 @@ func (s *TokenLogo) CheckLogoData(token, chainId, logoUrl string) (bool, error) 
 		}
 	}
 	return true, nil
+}
+
+// CheckTokenInfo  Insert token information if it was not in mysql
+func (s *TokenLogo) CheckTokenInfo(token, chainId string) error {
+	tokenInfo := models.TokenInfo{}
+	err := db.Mysql.Table("token_info").Where("token=? and chain_id=?", token, chainId).First(&tokenInfo).Debug().Error
+	if err != nil {
+		if errors.Is(err, gorm.ErrRecordNotFound) {
+			tokenInfo = models.TokenInfo{}
+			nowDateTime := utils.GetCurDateTimeFormat()
+			tokenInfo.Token = token
+			tokenInfo.ChainId = chainId
+			tokenInfo.UpdatedAt = nowDateTime
+			tokenInfo.CreatedAt = nowDateTime
+			err = db.Mysql.Table("token_info").Create(&tokenInfo).Debug().Error
+			if err != nil {
+				return err
+			}
+		} else {
+			return err
+		}
+	}
+	return nil
 }
 
 // SaveLogoData Saving logo data to mysql if it has new logo

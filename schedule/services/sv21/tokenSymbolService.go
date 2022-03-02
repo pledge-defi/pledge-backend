@@ -7,6 +7,7 @@ import (
 	"github.com/ethereum/go-ethereum/accounts/abi/bind"
 	"github.com/ethereum/go-ethereum/common"
 	"github.com/ethereum/go-ethereum/ethclient"
+	"gorm.io/gorm"
 	"os"
 	"pledge-backend/config"
 	abifile "pledge-backend/contract/abi"
@@ -197,6 +198,10 @@ func (s *TokenSymbol) CheckSymbolData(token, chainId, symbol string) (bool, erro
 	redisTokenInfoBytes, err := db.RedisGet("token_info:" + token + "_" + chainId)
 	if err != nil {
 		if err.Error() == "redigo: nil returned" {
+			err = s.CheckTokenInfo(token, chainId)
+			if err != nil {
+				log.Logger.Error(err.Error())
+			}
 			err = db.RedisSet("token_info:"+token+"_"+chainId, models.RedisTokenInfo{
 				Token:   token,
 				ChainId: chainId,
@@ -235,6 +240,29 @@ func (s *TokenSymbol) CheckSymbolData(token, chainId, symbol string) (bool, erro
 		}
 	}
 	return true, nil
+}
+
+// CheckTokenInfo  Insert token information if it was not in mysql
+func (s *TokenSymbol) CheckTokenInfo(token, chainId string) error {
+	tokenInfo := models.TokenInfo{}
+	err := db.Mysql.Table("token_info").Where("token=? and chain_id=?", token, chainId).First(&tokenInfo).Debug().Error
+	if err != nil {
+		if errors.Is(err, gorm.ErrRecordNotFound) {
+			tokenInfo = models.TokenInfo{}
+			nowDateTime := utils.GetCurDateTimeFormat()
+			tokenInfo.Token = token
+			tokenInfo.ChainId = chainId
+			tokenInfo.UpdatedAt = nowDateTime
+			tokenInfo.CreatedAt = nowDateTime
+			err = db.Mysql.Table("token_info").Create(tokenInfo).Debug().Error
+			if err != nil {
+				return err
+			}
+		} else {
+			return err
+		}
+	}
+	return nil
 }
 
 // SaveSymbolData Saving symbol data to mysql if it has new symbol

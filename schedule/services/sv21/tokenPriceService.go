@@ -3,8 +3,10 @@ package sv21
 import (
 	"encoding/json"
 	"errors"
+	"fmt"
 	"github.com/ethereum/go-ethereum/common"
 	"github.com/ethereum/go-ethereum/ethclient"
+	"gorm.io/gorm"
 	"pledge-backend/config"
 	tokengo "pledge-backend/contract/tokengo/tokenv22"
 	"pledge-backend/db"
@@ -108,8 +110,13 @@ func (s *TokenPrice) GetTestNetTokenPrice(token string) (error, int64) {
 // CheckPriceData Saving price data to redis if it has new price
 func (s *TokenPrice) CheckPriceData(token, chainId, price string) (bool, error) {
 	redisTokenInfoBytes, err := db.RedisGet("token_info:" + token + "_" + chainId)
+	fmt.Println("----__________----------______", err)
 	if err != nil {
 		if err.Error() == "redigo: nil returned" {
+			err = s.CheckTokenInfo(token, chainId)
+			if err != nil {
+				log.Logger.Error(err.Error())
+			}
 			err = db.RedisSet("token_info:"+token+"_"+chainId, models.RedisTokenInfo{
 				Token:   token,
 				ChainId: chainId,
@@ -126,6 +133,8 @@ func (s *TokenPrice) CheckPriceData(token, chainId, price string) (bool, error) 
 	} else {
 		redisTokenInfo := models.RedisTokenInfo{}
 		err = json.Unmarshal(redisTokenInfoBytes, &redisTokenInfo)
+		fmt.Println("----__________----------")
+		fmt.Println(redisTokenInfo)
 		if err != nil {
 			log.Logger.Error(err.Error())
 			return false, err
@@ -148,6 +157,29 @@ func (s *TokenPrice) CheckPriceData(token, chainId, price string) (bool, error) 
 		}
 	}
 	return true, nil
+}
+
+// CheckTokenInfo  Insert token information if it was not in mysql
+func (s *TokenPrice) CheckTokenInfo(token, chainId string) error {
+	tokenInfo := models.TokenInfo{}
+	err := db.Mysql.Table("token_info").Where("token=? and chain_id=?", token, chainId).First(&tokenInfo).Debug().Error
+	if err != nil {
+		if errors.Is(err, gorm.ErrRecordNotFound) {
+			tokenInfo = models.TokenInfo{}
+			nowDateTime := utils.GetCurDateTimeFormat()
+			tokenInfo.Token = token
+			tokenInfo.ChainId = chainId
+			tokenInfo.UpdatedAt = nowDateTime
+			tokenInfo.CreatedAt = nowDateTime
+			err = db.Mysql.Table("token_info").Create(tokenInfo).Debug().Error
+			if err != nil {
+				return err
+			}
+		} else {
+			return err
+		}
+	}
+	return nil
 }
 
 // SavePriceData Saving price data to mysql if it has new price
