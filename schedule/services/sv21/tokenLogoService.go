@@ -105,6 +105,7 @@ func (s *TokenLogo) CheckLogoData(token, chainId, logoUrl, symbol string) (bool,
 		}
 
 		redisTokenInfo.Logo = logoUrl
+		redisTokenInfo.Symbol = symbol
 		err = db.RedisSet(redisKey, redisTokenInfo, 0)
 		if err != nil {
 			log.Logger.Error(err.Error())

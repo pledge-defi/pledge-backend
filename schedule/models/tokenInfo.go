@@ -38,6 +38,13 @@ func (t *TokenInfo) GetTokenInfo(token, chainId string) (error, TokenInfo) {
 				return errors.New("record select err " + err.Error()), tokenInfo
 			}
 		}
+		db.RedisSet(redisKey, RedisTokenInfo{
+			Token:   token,
+			ChainId: chainId,
+			Price:   tokenInfo.Price,
+			Logo:    tokenInfo.Logo,
+			Symbol:  tokenInfo.Symbol,
+		}, 0)
 		return nil, tokenInfo
 	} else {
 		redisTokenInfo := RedisTokenInfo{}
