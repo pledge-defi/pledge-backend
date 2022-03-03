@@ -7,6 +7,7 @@ import (
 	"github.com/ethereum/go-ethereum/accounts/abi/bind"
 	"github.com/ethereum/go-ethereum/common"
 	"github.com/ethereum/go-ethereum/ethclient"
+	"gorm.io/gorm"
 	"os"
 	"pledge-backend/config"
 	abifile "pledge-backend/contract/abi"
@@ -90,7 +91,7 @@ func (s *TokenSymbol) GetRemoteAbiFileByToken(token, chainId string) error {
 
 	if abiJson.Status != "1" {
 		log.Logger.Error("get remote abi file failed: status 0 ")
-		return errors.New("get remote abi file failed: status 0")
+		return errors.New("get remote abi file failed: status 0 ")
 	}
 
 	abiJsonBytes, err := json.MarshalIndent(abiJson.Result, "", "\t")
@@ -194,20 +195,20 @@ func (s *TokenSymbol) GetContractSymbolOnTestNet(token, network string) (error, 
 
 // CheckSymbolData Saving symbol data to redis if it has new symbol
 func (s *TokenSymbol) CheckSymbolData(token, chainId, symbol string) (bool, error) {
-	redisTokenInfoBytes, err := db.RedisGet("token_info:" + token + "_" + chainId)
-	if err != nil {
-		if err.Error() == "redigo: nil returned" {
-			err = db.RedisSet("token_info:"+token+"_"+chainId, models.RedisTokenInfo{
-				Token:   token,
-				ChainId: chainId,
-				Symbol:  symbol,
-			}, 120)
-			if err != nil {
-				log.Logger.Error(err.Error())
-				return false, err
-			}
-		} else {
-			log.Logger.Sugar().Error("UpdateContractSymbol get symbol from redis err ", token, chainId, err)
+	redisKey := "token_info:" + chainId + ":" + token
+	redisTokenInfoBytes, err := db.RedisGet(redisKey)
+	if len(redisTokenInfoBytes) <= 0 {
+		err = s.CheckTokenInfo(token, chainId)
+		if err != nil {
+			log.Logger.Error(err.Error())
+		}
+		err = db.RedisSet(redisKey, models.RedisTokenInfo{
+			Token:   token,
+			ChainId: chainId,
+			Symbol:  symbol,
+		}, 0)
+		if err != nil {
+			log.Logger.Error(err.Error())
 			return false, err
 		}
 	} else {
@@ -222,19 +223,37 @@ func (s *TokenSymbol) CheckSymbolData(token, chainId, symbol string) (bool, erro
 			return false, nil
 		}
 
-		err = db.RedisSet("token_info:"+token+"_"+chainId, models.RedisTokenInfo{
-			Logo:    redisTokenInfo.Logo,
-			Token:   redisTokenInfo.Token,
-			Symbol:  symbol,
-			ChainId: redisTokenInfo.ChainId,
-			Price:   redisTokenInfo.Price,
-		}, 120)
+		redisTokenInfo.Symbol = symbol
+		err = db.RedisSet(redisKey, redisTokenInfo, 0)
 		if err != nil {
 			log.Logger.Error(err.Error())
 			return true, err
 		}
 	}
 	return true, nil
+}
+
+// CheckTokenInfo  Insert token information if it was not in mysql
+func (s *TokenSymbol) CheckTokenInfo(token, chainId string) error {
+	tokenInfo := models.TokenInfo{}
+	err := db.Mysql.Table("token_info").Where("token=? and chain_id=?", token, chainId).First(&tokenInfo).Debug().Error
+	if err != nil {
+		if errors.Is(err, gorm.ErrRecordNotFound) {
+			tokenInfo = models.TokenInfo{}
+			nowDateTime := utils.GetCurDateTimeFormat()
+			tokenInfo.Token = token
+			tokenInfo.ChainId = chainId
+			tokenInfo.UpdatedAt = nowDateTime
+			tokenInfo.CreatedAt = nowDateTime
+			err = db.Mysql.Table("token_info").Create(tokenInfo).Debug().Error
+			if err != nil {
+				return err
+			}
+		} else {
+			return err
+		}
+	}
+	return nil
 }
 
 // SaveSymbolData Saving symbol data to mysql if it has new symbol

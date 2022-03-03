@@ -2,6 +2,8 @@ package sv22
 
 import (
 	"encoding/json"
+	"errors"
+	"gorm.io/gorm"
 	"pledge-backend/config"
 	"pledge-backend/db"
 	"pledge-backend/log"
@@ -33,14 +35,14 @@ func (s *TokenLogo) UpdateTokenLogo() {
 		}
 		for _, t := range tokenLogoRemote.Tokens {
 
-			hasNewData, err := s.CheckLogoData(t.Address, utils.IntToString(t.ChainID), t.LogoURI)
+			hasNewData, err := s.CheckLogoData(t.Address, utils.IntToString(t.ChainID), t.LogoURI, t.Symbol)
 			if err != nil {
 				log.Logger.Sugar().Error("UpdateTokenLogo CheckLogoData err ", err)
 				continue
 			}
 
 			if hasNewData {
-				err = s.SaveLogoData(t.Address, utils.IntToString(t.ChainID), t.LogoURI)
+				err = s.SaveLogoData(t.Address, utils.IntToString(t.ChainID), t.LogoURI, t.Symbol)
 				if err != nil {
 					log.Logger.Sugar().Error("UpdateTokenLogo SaveLogoData err ", err)
 					continue
@@ -55,13 +57,13 @@ func (s *TokenLogo) UpdateTokenLogo() {
 			if t["token"] == "" {
 				continue
 			}
-			hasNewData, err := s.CheckLogoData(t["token"], t["chain_id"], t["logo"])
+			hasNewData, err := s.CheckLogoData(t["token"], t["chain_id"], t["logo"], t["symbol"])
 			if err != nil {
 				continue
 			}
 
 			if hasNewData {
-				err = s.SaveLogoData(t["token"], t["chain_id"], t["logo"])
+				err = s.SaveLogoData(t["token"], t["chain_id"], t["logo"], t["symbol"])
 				if err != nil {
 					log.Logger.Sugar().Error("UpdateTokenLogo SaveLogoData err ", err)
 					continue
@@ -72,21 +74,22 @@ func (s *TokenLogo) UpdateTokenLogo() {
 }
 
 // CheckLogoData Saving logo data to redis if it has new logo
-func (s *TokenLogo) CheckLogoData(token, chainId, logoUrl string) (bool, error) {
-	redisTokenInfoBytes, err := db.RedisGet("token_info:" + token + "_" + chainId)
-	if err != nil {
-		if err.Error() == "redigo: nil returned" {
-			err = db.RedisSet("token_info:"+token+"_"+chainId, models.RedisTokenInfo{
-				Token:   token,
-				ChainId: chainId,
-				Logo:    logoUrl,
-			}, 120)
-			if err != nil {
-				log.Logger.Error(err.Error())
-				return false, err
-			}
-		} else {
-			log.Logger.Sugar().Error("UpdateTokenLogo get logo from redis err ", token, chainId, err)
+func (s *TokenLogo) CheckLogoData(token, chainId, logoUrl, symbol string) (bool, error) {
+	redisKey := "token_info:" + chainId + ":" + token
+	redisTokenInfoBytes, err := db.RedisGet(redisKey)
+	if len(redisTokenInfoBytes) <= 0 {
+		err = s.CheckTokenInfo(token, chainId)
+		if err != nil {
+			log.Logger.Error(err.Error())
+		}
+		err = db.RedisSet(redisKey, models.RedisTokenInfo{
+			Token:   token,
+			ChainId: chainId,
+			Logo:    logoUrl,
+			Symbol:  symbol,
+		}, 0)
+		if err != nil {
+			log.Logger.Error(err.Error())
 			return false, err
 		}
 	} else {
@@ -101,13 +104,9 @@ func (s *TokenLogo) CheckLogoData(token, chainId, logoUrl string) (bool, error) 
 			return false, nil
 		}
 
-		err = db.RedisSet("token_info:"+token+"_"+chainId, models.RedisTokenInfo{
-			Logo:    logoUrl,
-			Token:   redisTokenInfo.Token,
-			Symbol:  redisTokenInfo.Symbol,
-			ChainId: redisTokenInfo.ChainId,
-			Price:   redisTokenInfo.Price,
-		}, 120)
+		redisTokenInfo.Logo = logoUrl
+		redisTokenInfo.Symbol = symbol
+		err = db.RedisSet(redisKey, redisTokenInfo, 0)
 		if err != nil {
 			log.Logger.Error(err.Error())
 			return true, err
@@ -116,11 +115,35 @@ func (s *TokenLogo) CheckLogoData(token, chainId, logoUrl string) (bool, error) 
 	return true, nil
 }
 
+// CheckTokenInfo  Insert token information if it was not in mysql
+func (s *TokenLogo) CheckTokenInfo(token, chainId string) error {
+	tokenInfo := models.TokenInfo{}
+	err := db.Mysql.Table("token_info").Where("token=? and chain_id=?", token, chainId).First(&tokenInfo).Debug().Error
+	if err != nil {
+		if errors.Is(err, gorm.ErrRecordNotFound) {
+			tokenInfo = models.TokenInfo{}
+			nowDateTime := utils.GetCurDateTimeFormat()
+			tokenInfo.Token = token
+			tokenInfo.ChainId = chainId
+			tokenInfo.UpdatedAt = nowDateTime
+			tokenInfo.CreatedAt = nowDateTime
+			err = db.Mysql.Table("token_info").Create(&tokenInfo).Debug().Error
+			if err != nil {
+				return err
+			}
+		} else {
+			return err
+		}
+	}
+	return nil
+}
+
 // SaveLogoData Saving logo data to mysql if it has new logo
-func (s *TokenLogo) SaveLogoData(token, chainId, logoUrl string) error {
+func (s *TokenLogo) SaveLogoData(token, chainId, logoUrl, symbol string) error {
 	nowDateTime := utils.GetCurDateTimeFormat()
 
 	err := db.Mysql.Table("token_info").Where("token=? and chain_id=? ", token, chainId).Updates(map[string]interface{}{
+		"symbol":     symbol,
 		"logo":       logoUrl,
 		"updated_at": nowDateTime,
 	}).Debug().Error
