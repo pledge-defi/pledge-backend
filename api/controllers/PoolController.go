@@ -16,7 +16,7 @@ type PoolController struct {
 func (c *PoolController) PoolBaseInfo(ctx *gin.Context) {
 	res := response.Gin{Res: ctx}
 	req := request.PoolBaseInfo{}
-	result := []models.PoolBaseInfoRes{}
+	var result []models.PoolBaseInfoRes
 
 	errCode := validate.NewPoolBaseInfo().PoolBaseInfo(ctx, &req)
 	if errCode != statecode.COMMON_SUCCESS {
@@ -37,7 +37,7 @@ func (c *PoolController) PoolBaseInfo(ctx *gin.Context) {
 func (c *PoolController) PoolDataInfo(ctx *gin.Context) {
 	res := response.Gin{Res: ctx}
 	req := request.PoolDataInfo{}
-	result := []models.PoolDataInfoRes{}
+	var result []models.PoolDataInfoRes
 
 	errCode := validate.NewPoolDataInfo().PoolDataInfo(ctx, &req)
 	if errCode != statecode.COMMON_SUCCESS {
