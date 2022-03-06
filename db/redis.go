@@ -46,15 +46,15 @@ func InitRedis() *redis.Pool {
 }
 
 // RedisSet 设置key、value、time
-func RedisSet(key string, data interface{}, secs int) error {
+func RedisSet(key string, data interface{}, aliveSeconds int) error {
 	conn := RedisConn.Get()
 	defer conn.Close()
 	value, err := json.Marshal(data)
 	if err != nil {
 		return err
 	}
-	if secs > 0 {
-		_, err = conn.Do("set", key, value, "EX", secs)
+	if aliveSeconds > 0 {
+		_, err = conn.Do("set", key, value, "EX", aliveSeconds)
 	} else {
 		_, err = conn.Do("set", key, value)
 	}

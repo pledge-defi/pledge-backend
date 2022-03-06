@@ -53,7 +53,7 @@ func init() {
 	// 开启文件及行号
 	development := zap.Development()
 	// 设置初始化字段
-	filed := zap.Fields(zap.String("serviceName", "pool"))
+	filed := zap.Fields(zap.String("serviceName", "pledge"))
 	// 构造日志
 	Logger = zap.New(core, caller, development, filed)
 }
