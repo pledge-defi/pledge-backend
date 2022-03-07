@@ -9,8 +9,8 @@ import (
 
 func init() {
 	currentAbPath := getCurrentAbPathByCaller()
-	tomlFile, err := filepath.Abs(currentAbPath + "/configv21.toml")
-	//tomlFile, err := filepath.Abs(currentAbPath + "/configv22.toml")
+	tomlFile, err := filepath.Abs(currentAbPath + "/configV21.toml")
+	//tomlFile, err := filepath.Abs(currentAbPath + "/configV22.toml")
 	if err != nil {
 		panic("read toml file err: " + err.Error())
 		return
