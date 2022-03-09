@@ -60,19 +60,22 @@ func (c *PoolController) PoolDataInfo(ctx *gin.Context) {
 }
 
 func (c *PoolController) TokenList(ctx *gin.Context) {
-	res := response.Gin{Res: ctx}
 	req := request.TokenList{}
 	result := response.TokenList{}
 
 	errCode := validate.NewTokenList().TokenList(ctx, &req)
 	if errCode != statecode.COMMON_SUCCESS {
-		res.Response(ctx, errCode, nil)
+		ctx.JSON(200, map[string]string{
+			"error": "server error",
+		})
 		return
 	}
 
 	errCode, data := services.NewTokenList().GetTokenList(&req)
 	if errCode != statecode.COMMON_SUCCESS {
-		res.Response(ctx, errCode, nil)
+		ctx.JSON(200, map[string]string{
+			"error": "server error",
+		})
 		return
 	}
 
