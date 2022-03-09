@@ -55,6 +55,27 @@ func (c *PoolController) PoolDataInfo(ctx *gin.Context) {
 	return
 }
 
+func (c *PoolController) TokenList(ctx *gin.Context) {
+	res := response.Gin{Res: ctx}
+	req := request.TokenList{}
+	//result := make([]response.TokenList, 0)
+
+	errCode := validate.NewTokenList().TokenList(ctx, &req)
+	if errCode != statecode.COMMON_SUCCESS {
+		res.Response(ctx, errCode, nil)
+		return
+	}
+
+	errCode, result := services.NewTokenList().GetTokenList(&req)
+	if errCode != statecode.COMMON_SUCCESS {
+		res.Response(ctx, errCode, nil)
+		return
+	}
+
+	res.Response(ctx, statecode.COMMON_SUCCESS, result)
+	return
+}
+
 func (c *PoolController) Search(ctx *gin.Context) {
 	res := response.Gin{Res: ctx}
 	req := request.Search{}
@@ -88,7 +109,7 @@ func (c *PoolController) DebtTokenList(ctx *gin.Context) {
 		return
 	}
 
-	errCode, result := services.NewTokenList().GetTokenList(&req)
+	errCode, result := services.NewTokenList().DebtTokenList(&req)
 	if errCode != statecode.COMMON_SUCCESS {
 		res.Response(ctx, errCode, nil)
 		return

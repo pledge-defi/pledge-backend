@@ -2,7 +2,7 @@ package main
 
 import (
 	"pledge-backend/db"
-	"pledge-backend/schedule/common"
+	"pledge-backend/schedule/tasks"
 )
 
 func main() {
@@ -14,10 +14,10 @@ func main() {
 	db.InitRedis()
 
 	//run pool task v21
-	common.TaskV21()
+	tasks.TaskV21()
 
 	//run pool task v22
-	//common.TaskV22()
+	//tasks.TaskV22()
 
 }
 

@@ -17,9 +17,6 @@ func NewTokenList() *TokenList {
 func (v *TokenList) TokenList(c *gin.Context, req *request.TokenList) int {
 
 	err := c.ShouldBind(req)
-	if req.ChainId != 97 && req.ChainId != 56 {
-		return statecode.CHAINID_ERR
-	}
 	if err == io.EOF {
 		return statecode.PARAMETER_EMPTY_ERR
 	} else if err != nil {
@@ -30,6 +27,10 @@ func (v *TokenList) TokenList(c *gin.Context, req *request.TokenList) int {
 			}
 		}
 		return statecode.COMMON_ERR_SERVER_ERR
+	}
+
+	if req.ChainId != 97 && req.ChainId != 56 {
+		return statecode.CHAINID_ERR
 	}
 
 	return statecode.COMMON_SUCCESS

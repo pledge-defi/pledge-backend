@@ -16,6 +16,7 @@ func InitRoute(e *gin.Engine) *gin.Engine {
 	poolController := controllers.PoolController{}
 	v2Group.GET("/poolBaseInfo", poolController.PoolBaseInfo)                                   //pool base information
 	v2Group.GET("/poolDataInfo", poolController.PoolDataInfo)                                   //pool data information
+	v2Group.GET("/token", poolController.TokenList)                                             //pool token information
 	v2Group.POST("/pool/debtTokenList", middlewares.CheckToken(), poolController.DebtTokenList) //pool debtTokenList
 	v2Group.POST("/pool/search", middlewares.CheckToken(), poolController.Search)               //pool search
 

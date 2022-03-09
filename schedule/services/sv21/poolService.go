@@ -2,6 +2,7 @@ package sv21
 
 import (
 	"encoding/json"
+	"fmt"
 	"github.com/ethereum/go-ethereum/common"
 	"github.com/ethereum/go-ethereum/ethclient"
 	"math/big"
@@ -9,6 +10,7 @@ import (
 	tokengo "pledge-backend/contract/tokengo/tokenv22"
 	"pledge-backend/db"
 	"pledge-backend/log"
+	commonPledge "pledge-backend/schedule/common"
 	"pledge-backend/schedule/models"
 	"pledge-backend/utils"
 	"strings"
@@ -23,12 +25,14 @@ func NewPool() *poolService {
 func (s *poolService) UpdateAllPoolInfo() {
 
 	s.UpdatePoolInfo(config.Config.TestNet.PledgePoolToken, config.Config.TestNet.NetUrl, config.Config.TestNet.ChainId)
+
 	s.UpdatePoolInfo(config.Config.MainNet.PledgePoolToken, config.Config.MainNet.NetUrl, config.Config.MainNet.ChainId)
 
 }
 
 func (s *poolService) UpdatePoolInfo(contractAddress, network, chainId string) {
-	log.Logger.Sugar().Info("UpdatePoolInfo", contractAddress, network)
+
+	log.Logger.Sugar().Info("UpdatePoolInfo ", contractAddress+" "+network)
 	ethereumConn, err := ethclient.Dial(network)
 	if nil != err {
 		log.Logger.Error(err.Error())
@@ -52,7 +56,10 @@ func (s *poolService) UpdatePoolInfo(contractAddress, network, chainId string) {
 		log.Logger.Error(err.Error())
 		return
 	}
+
 	for i := 0; i <= int(pLength.Int64())-1; i++ {
+
+		log.Logger.Sugar().Info("UpdatePoolInfo ", i)
 		poolId := utils.IntToString(i + 1)
 		baseInfo, err := pledgePoolToken.PledgePoolTokenCaller.PoolBaseInfo(nil, big.NewInt(int64(i)))
 		if err != nil {
@@ -131,6 +138,36 @@ func (s *poolService) UpdatePoolInfo(contractAddress, network, chainId string) {
 				log.Logger.Sugar().Error("SavePoolData err ", chainId, poolId)
 			}
 			db.RedisSet("data_info:pool_"+chainId+"_"+poolId, dataInfoMd5Str, 60*30) //The expiration time is set to prevent hsah collision
+		}
+	}
+}
+
+func (s *poolService) OverTime() {
+	commonPledge.PoolTask.OnTime = 0
+	commonPledge.PoolTask.OverTime++
+	fmt.Println("超时次数增加一次", commonPledge.PoolTask.Duration, utils.NowDataTime())
+	if commonPledge.PoolTask.OverTime >= 5 {
+		log.Logger.Sugar().Info("UpdatePoolInfo add scheduled task interval ", config.Config.Env.TaskExtendDuration)
+		commonPledge.PoolTask.Duration += config.Config.Env.TaskExtendDuration
+		fmt.Println("间隔增加一次", commonPledge.PoolTask.Duration, utils.NowDataTime())
+		commonPledge.TaskDurationModifyChannel <- commonPledge.Scheduler{
+			Task:     commonPledge.PoolTask.Task,
+			Duration: commonPledge.PoolTask.Duration,
+		}
+	}
+}
+
+func (s *poolService) OnTime(startTime, endTime int64) {
+	commonPledge.PoolTask.OverTime = 0
+	commonPledge.PoolTask.OnTime++
+	if commonPledge.PoolTask.OnTime >= 5 && ((endTime-startTime)/config.Config.Env.TaskExtendDuration >= 2) {
+		if commonPledge.PoolTask.Duration-config.Config.Env.TaskExtendDuration >= 1 {
+			commonPledge.PoolTask.Duration -= config.Config.Env.TaskExtendDuration
+			log.Logger.Sugar().Info("UpdatePoolInfo shorten scheduled task interval ", config.Config.Env.TaskExtendDuration)
+			commonPledge.TaskDurationModifyChannel <- commonPledge.Scheduler{
+				Task:     commonPledge.PoolTask.Task,
+				Duration: commonPledge.PoolTask.Duration,
+			}
 		}
 	}
 }

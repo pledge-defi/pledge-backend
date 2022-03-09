@@ -51,7 +51,7 @@ func NewPoolBase() *PoolBase {
 	return &PoolBase{}
 }
 
-// Save poolBase information
+// SavePoolBase Save poolBase information
 func (p *PoolBase) SavePoolBase(chainId, poolId string, poolBase *PoolBase) error {
 
 	nowDateTime := utils.GetCurDateTimeFormat()

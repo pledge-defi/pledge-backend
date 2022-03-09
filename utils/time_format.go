@@ -74,3 +74,8 @@ func TimeStringFormatTimeUnix(timeFormat string, timeSrc string) int64 {
 func GetCurDateTimeFormat() string {
 	return time.Now().Format("2006-01-02 15:04:05")
 }
+
+// NowDataTime now datetime
+func NowDataTime() string {
+	return time.Now().Format("2006-01-02 15:04:05")
+}

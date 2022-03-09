@@ -12,11 +12,20 @@ func NewTokenList() *TokenList {
 	return &TokenList{}
 }
 
-func (c *TokenList) GetTokenList(req *request.TokenList) (int, []models.TokenInfo) {
+func (c *TokenList) DebtTokenList(req *request.TokenList) (int, []models.TokenInfo) {
 	err, res := models.NewTokenInfo().GetTokenInfo(req)
 	if err != nil {
 		return statecode.COMMON_ERR_SERVER_ERR, nil
 	}
 	return statecode.COMMON_SUCCESS, res
+
+}
+
+func (c *TokenList) GetTokenList(req *request.TokenList) (int, []models.TokenList) {
+	err, tokenList := models.NewTokenInfo().GetTokenList(req)
+	if err != nil {
+		return statecode.COMMON_ERR_SERVER_ERR, nil
+	}
+	return statecode.COMMON_SUCCESS, tokenList
 
 }

@@ -25,7 +25,7 @@ func NewPoolData() *PoolData {
 	return &PoolData{}
 }
 
-// Save poolData information
+// SavePoolData Save poolData information
 func (t *PoolData) SavePoolData(chainId, poolId string, poolData *PoolData) error {
 
 	nowDateTime := utils.GetCurDateTimeFormat()

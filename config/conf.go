@@ -14,10 +14,12 @@ type Conf struct {
 }
 
 type EnvConfig struct {
-	Port       string `toml:"port"`
-	Version    string `toml:"version"`
-	DomainName string `toml:"domain_name"`
-	Protocol   string `toml:"protocol"`
+	Port               string `toml:"port"`
+	Version            string `toml:"version"`
+	Protocol           string `toml:"protocol"`
+	DomainName         string `toml:"domain_name"`
+	TaskDuration       int64  `toml:"task_duration"`
+	TaskExtendDuration int64  `toml:"task_extend_duration"`
 }
 type DefaultAdminConfig struct {
 	Username string `toml:"username"`
