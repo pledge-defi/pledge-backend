@@ -8,6 +8,9 @@ import (
 	"pledge-backend/api/models/response"
 	"pledge-backend/api/services"
 	"pledge-backend/api/validate"
+	"pledge-backend/config"
+	"regexp"
+	"strings"
 )
 
 type PoolController struct {
@@ -58,7 +61,7 @@ func (c *PoolController) PoolDataInfo(ctx *gin.Context) {
 func (c *PoolController) TokenList(ctx *gin.Context) {
 	res := response.Gin{Res: ctx}
 	req := request.TokenList{}
-	//result := make([]response.TokenList, 0)
+	result := response.TokenList{}
 
 	errCode := validate.NewTokenList().TokenList(ctx, &req)
 	if errCode != statecode.COMMON_SUCCESS {
@@ -66,13 +69,26 @@ func (c *PoolController) TokenList(ctx *gin.Context) {
 		return
 	}
 
-	errCode, result := services.NewTokenList().GetTokenList(&req)
+	errCode, data := services.NewTokenList().GetTokenList(&req)
 	if errCode != statecode.COMMON_SUCCESS {
 		res.Response(ctx, errCode, nil)
 		return
 	}
 
-	res.Response(ctx, statecode.COMMON_SUCCESS, result)
+	var BaseUrl = c.GetBaseUrl()
+	result.Name = "Pledge Token List"
+	result.LogoURI = BaseUrl + "storage/img/Pledge-project-logo.png"
+	for _, v := range data {
+		result.Tokens = append(result.Tokens, response.Token{
+			Name:    v.Symbol,
+			Symbol:  v.Symbol,
+			Address: v.Token,
+			ChainID: v.ChainId,
+			LogoURI: v.Logo,
+		})
+	}
+
+	ctx.JSON(200, result)
 	return
 }
 
@@ -117,4 +133,16 @@ func (c *PoolController) DebtTokenList(ctx *gin.Context) {
 
 	res.Response(ctx, statecode.COMMON_SUCCESS, result)
 	return
+}
+
+func (c *PoolController) GetBaseUrl() string {
+
+	domainName := config.Config.Env.DomainName
+	domainNameSlice := strings.Split(domainName, "")
+	pattern := "\\d+"
+	isNumber, _ := regexp.MatchString(pattern, domainNameSlice[0])
+	if isNumber {
+		return config.Config.Env.Protocol + "://" + config.Config.Env.DomainName + ":" + config.Config.Env.Port + "/"
+	}
+	return config.Config.Env.Protocol + "://" + config.Config.Env.DomainName + "/"
 }
