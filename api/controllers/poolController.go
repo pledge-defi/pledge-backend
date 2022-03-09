@@ -11,6 +11,7 @@ import (
 	"pledge-backend/config"
 	"regexp"
 	"strings"
+	"time"
 )
 
 type PoolController struct {
@@ -78,13 +79,20 @@ func (c *PoolController) TokenList(ctx *gin.Context) {
 	var BaseUrl = c.GetBaseUrl()
 	result.Name = "Pledge Token List"
 	result.LogoURI = BaseUrl + "storage/img/Pledge-project-logo.png"
+	result.Timestamp = time.Now()
+	result.Version = response.Version{
+		Major: 2,
+		Minor: 16,
+		Patch: 12,
+	}
 	for _, v := range data {
 		result.Tokens = append(result.Tokens, response.Token{
-			Name:    v.Symbol,
-			Symbol:  v.Symbol,
-			Address: v.Token,
-			ChainID: v.ChainId,
-			LogoURI: v.Logo,
+			Name:     v.Symbol,
+			Symbol:   v.Symbol,
+			Decimals: v.Decimals,
+			Address:  v.Token,
+			ChainID:  v.ChainId,
+			LogoURI:  v.Logo,
 		})
 	}
 
