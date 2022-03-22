@@ -8,7 +8,9 @@ type Conf struct {
 	TestNet      TestNetConfig
 	MainNet      MainNetConfig
 	Token        TokenConfig
+	Email        EmailConfig
 	DefaultAdmin DefaultAdminConfig
+	Threshold    ThresholdConfig
 	Jwt          JwtConfig
 	Env          EnvConfig
 }
@@ -21,6 +23,22 @@ type EnvConfig struct {
 	TaskDuration       int64  `toml:"task_duration"`
 	TaskExtendDuration int64  `toml:"task_extend_duration"`
 }
+
+type ThresholdConfig struct {
+	PledgePoolTokenThresholdBnb string `toml:"pledge_pool_token_threshold_bnb"`
+}
+
+type EmailConfig struct {
+	Username string   `toml:"username"`
+	Pwd      string   `toml:"pwd"`
+	Host     string   `toml:"host"`
+	Port     string   `toml:"port"`
+	From     string   `toml:"from"`
+	Subject  string   `toml:"subject"`
+	To       []string `toml:"to"`
+	Cc       []string `toml:"cc"`
+}
+
 type DefaultAdminConfig struct {
 	Username string `toml:"username"`
 	Password string `toml:"password"`

@@ -10,6 +10,7 @@ require (
 	github.com/go-playground/validator/v10 v10.10.0
 	github.com/gomodule/redigo v1.8.8
 	github.com/jasonlvhit/gocron v0.0.1
+	github.com/jordan-wright/email v4.0.1-0.20210109023952-943e75fe5223+incompatible
 	github.com/shopspring/decimal v1.3.1
 	go.uber.org/zap v1.21.0
 	golang.org/x/crypto v0.0.0-20220214200702-86341886e292

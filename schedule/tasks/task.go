@@ -27,6 +27,7 @@ func TaskV21() {
 	s.Every(1).Minute().Do(sv21.NewTokenPrice().UpdateContractPrice)
 	s.Every(2).Hours().Do(sv21.NewTokenSymbol().UpdateContractSymbol)
 	s.Every(2).Hours().Do(sv21.NewTokenLogo().UpdateTokenLogo)
+	s.Every(30).Minutes().From(gocron.NextTick()).Do(sv21.NewBalanceMonitor().Monitor)
 	<-s.Start() // Start all the pending jobs
 
 }
@@ -51,5 +52,6 @@ func TaskV22() {
 	s.Every(1).Minute().Do(sv22.NewTokenPrice().UpdateContractPrice)
 	s.Every(2).Hours().Do(sv22.NewTokenSymbol().UpdateContractSymbol)
 	s.Every(2).Hours().Do(sv22.NewTokenLogo().UpdateTokenLogo)
+	s.Every(30).Minutes().From(gocron.NextTick()).Do(sv22.NewBalanceMonitor().Monitor)
 	<-s.Start() // Start all the pending jobs
 }

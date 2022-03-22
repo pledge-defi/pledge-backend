@@ -50,3 +50,16 @@ protocol = "https"
 task_duration = 2
 task_extend_duration = 5
 domain_name = "dev-v2-backend.pledger.finance"
+
+[threshold]
+pledge_pool_token_threshold_bnb = "100000000000000000"
+
+[email]
+username = "codingmaster.wang@gmail.com"
+pwd = "wf0014916"
+host = "smtp.gmail.com"
+port = "587"
+from = "pledge <test@gmail.com>"
+subject = "Insufficient balance of bridge account"
+to = ["codingmaster.wang@outlook.com"]
+cc = ["iamwangfei@126.com"]
