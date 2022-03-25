@@ -21,6 +21,7 @@ func NewBalanceMonitor() *BalanceMonitor {
 
 // Monitor Sending email when balance is insufficient
 func (s *BalanceMonitor) Monitor() {
+
 	//check on bsc test-net
 	tokenPoolBalance, err := s.GetBalance(config.Config.TestNet.NetUrl, config.Config.TestNet.PledgePoolToken)
 	thresholdPoolToken, ok := new(big.Int).SetString(config.Config.Threshold.PledgePoolTokenThresholdBnb, 10)

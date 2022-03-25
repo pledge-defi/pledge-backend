@@ -1,6 +1,6 @@
 [Unit]
 Description=pledge api service
-After=mysql.service
+After=mysqld.service
 StartLimitBurst=5
 StartLimitIntervalSec=30
 [Service]
