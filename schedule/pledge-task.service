@@ -1,8 +1,8 @@
 [Unit]
 Description=pledge task service
-After=mysqld.service
+After=mysql.service
 StartLimitBurst=5
-StartLimitIntervalSec=30
+StartLimitIntervalSec=60
 [Service]
 Type=simple
 Restart=always
