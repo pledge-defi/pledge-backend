@@ -22,6 +22,7 @@ func main() {
 	validate.BindingValidator()
 
 	// gin start
+	gin.SetMode(gin.ReleaseMode)
 	app := gin.Default()
 	staticPath := static.GetCurrentAbPathByCaller()
 	app.Static("/storage/", staticPath)
