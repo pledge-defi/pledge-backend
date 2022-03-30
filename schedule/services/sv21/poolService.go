@@ -7,7 +7,7 @@ import (
 	"github.com/ethereum/go-ethereum/ethclient"
 	"math/big"
 	"pledge-backend/config"
-	tokengo "pledge-backend/contract/tokengo/tokenv22"
+	tokengo "pledge-backend/contract/bindings/tokenv22"
 	"pledge-backend/db"
 	"pledge-backend/log"
 	commonPledge "pledge-backend/schedule/common"
