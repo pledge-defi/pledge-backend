@@ -14,6 +14,8 @@ var PlgrPriceChain = make(chan string, 2)
 
 func GetExchangePrice() {
 
+	log.Logger.Sugar().Info("GetExchangePrice ")
+
 	// get plgr price from redis
 	price, err := db.RedisGetString("plgr_price")
 	if err != nil {
@@ -72,6 +74,7 @@ func GetExchangePrice() {
 			}
 			PlgrPriceChain <- t.Price
 			PlgrPrice = t.Price
+			log.Logger.Sugar().Info("Price ", t.Price)
 			db.RedisSet("plgr_price", PlgrPrice, 0)
 		}
 	}
