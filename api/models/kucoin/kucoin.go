@@ -2,27 +2,35 @@ package kucoin
 
 import (
 	"github.com/Kucoin/kucoin-go-sdk"
+	"pledge-backend/db"
 	"pledge-backend/log"
 )
 
 // ApiKeyVersionV2 is v2 api key version
 const ApiKeyVersionV2 = "2"
 
+var PlgrPrice = "0.0027"
+
 func GetExchangePrice() {
-	log.Logger.Info("2wdasdasq12323455etrdfsdzc")
+
+	// get plgr price from redis
+	price, err := db.RedisGetString("plgr_price")
+	if err != nil {
+		log.Logger.Sugar().Error("get plgr price from redis err ", err)
+	} else {
+		PlgrPrice = price
+	}
+
 	s := kucoin.NewApiService(
-		// kucoin.ApiBaseURIOption("https://api.kucoin.com"),
 		kucoin.ApiKeyOption("key"),
 		kucoin.ApiSecretOption("secret"),
 		kucoin.ApiPassPhraseOption("passphrase"),
 		kucoin.ApiKeyVersionOption(ApiKeyVersionV2),
 	)
-	log.Logger.Info("6666666")
 
 	rsp, err := s.WebSocketPublicToken()
 	if err != nil {
-		// Handle error
-		log.Logger.Error(err.Error())
+		log.Logger.Error(err.Error()) // Handle error
 		return
 	}
 
@@ -31,7 +39,6 @@ func GetExchangePrice() {
 		log.Logger.Error(err.Error())
 		return
 	}
-	log.Logger.Info("555555")
 
 	c := s.NewWebSocketClient(tk)
 
@@ -54,16 +61,15 @@ func GetExchangePrice() {
 		case err := <-ec:
 			c.Stop() // Stop subscribing the WebSocket feed
 			log.Logger.Sugar().Errorf("Error: %s", err.Error())
-			// Handle error
 			return
 		case msg := <-mc:
-			// log.Printf("Received: %s", kucoin.ToJsonString(m))
 			t := &kucoin.TickerLevel1Model{}
 			if err := msg.ReadData(t); err != nil {
 				log.Logger.Sugar().Errorf("Failure to read: %s", err.Error())
 				return
 			}
-			log.Logger.Sugar().Infof("Ticker: %s, %s, %s, %s", msg.Topic, t.Sequence, t.Price, t.Size)
+			PlgrPrice = t.Price
+			db.RedisSet("plgr_price", PlgrPrice, 0)
 		}
 	}
 }
