@@ -1,16 +1,18 @@
 package ws
 
 import (
-	"flag"
-	"fmt"
+	"encoding/json"
+	"errors"
 	"github.com/gorilla/websocket"
-	"net/url"
-	"os"
-	"os/signal"
+	"golang.org/x/sync/errgroup"
+	"pledge-backend/api/models/kucoin"
 	"pledge-backend/log"
 	"sync"
 	"time"
 )
+
+const SuccessCode = 0
+const ErrorCode = -1
 
 type Server struct {
 	sync.Mutex
@@ -27,162 +29,102 @@ type ServerManager struct {
 	Unregister chan *Server
 }
 
+type Message struct {
+	Code int    `json:"code"`
+	Data string `json:"data"`
+}
+
 var Manager = ServerManager{}
 var UserPingPongDurTime int64 = 20 // seconds
 var ServerChain = make(chan *Server)
 
-func (s *Server) SendToClient(msg []byte) {
+func (s *Server) SendToClient(data string, code int) {
 	s.Lock()
 	defer s.Unlock()
-	err := s.Socket.WriteMessage(websocket.TextMessage, msg)
+
+	dataBytes, err := json.Marshal(Message{
+		Code: code,
+		Data: data,
+	})
+	err = s.Socket.WriteMessage(websocket.TextMessage, dataBytes)
 	if err != nil {
 		log.Logger.Sugar().Error(s.Id+" SendToClient err ", err)
 	}
 }
 
 func (s *Server) ReadAndWrite() {
-	defer func() {
-		recover := recover()
-		if recover != nil {
-			fmt.Println(s.Id, "read recover")
-		}
-		s.Socket.Close()
-		Manager.Servers.Delete(s)
-	}()
+
+	eg := errgroup.Group{}
+
 	//write
-	go func() {
+	eg.Go(func() error {
 		for {
 			select {
 			case message, ok := <-s.Send:
 				if !ok {
 					Manager.Servers.Delete(s)
-					return
+					return errors.New("write message error")
 				}
-				_, has := Manager.Servers.Load(s)
-				if has {
-					s.SendToClient(message)
-				} else {
-					Manager.Servers.Delete(s)
-					return
-				}
-			case <-time.After(time.Second):
-				_, has := Manager.Servers.Load(s)
-				if !has {
-					Manager.Servers.Delete(s)
-					return
-				}
+				s.SendToClient(string(message), SuccessCode)
 			}
 		}
-	}()
+	})
+
 	//read
-	go func() {
+	eg.Go(func() error {
 		for {
 			_, message, err := s.Socket.ReadMessage()
 			if err != nil {
-				return
+				log.Logger.Sugar().Error(s.Id+" ReadMessage err ", err)
+				return err
 			}
 			//update ping time
 			if string(message) == "ping" || string(message) == `"ping"` || string(message) == "'ping'" {
 				s.LastTime = time.Now().Unix()
-				//写不进跳过
-				_, has := Manager.Servers.Load(s)
-				if has {
-					s.Send <- []byte("pong")
-				} else {
-					Manager.Servers.Delete(s)
-					return
-				}
+				s.Send <- []byte("pong")
 			}
 			continue
 		}
-	}()
+	})
+
 	//check ping pong
-	for {
-		select {
-		case <-time.After(time.Second):
-			if time.Now().Unix()-s.LastTime >= UserPingPongDurTime {
-				log.Logger.Info(s.Id + " timeout")
-				return
-			}
-			_, has := Manager.Servers.Load(s)
-			if !has {
-				return
+	eg.Go(func() error {
+		for {
+			select {
+			case <-time.After(time.Second):
+				if time.Now().Unix()-s.LastTime >= UserPingPongDurTime {
+					s.SendToClient("ping timeout", ErrorCode)
+					log.Logger.Info(s.Id + " timeout")
+					Manager.Servers.Delete(s)
+					return errors.New("ping timeout")
+				}
 			}
 		}
+	})
+
+	if err := eg.Wait(); err != nil {
+		log.Logger.Sugar().Error(s.Id, " ReadAndWrite returned ", err)
+		return
 	}
+
 }
 
 func StartServer() {
 	log.Logger.Info("WsServer start")
 	for {
 		select {
-		case conn, ok := <-ServerChain:
+		case s, ok := <-ServerChain:
 			if ok {
-				go conn.ReadAndWrite()
+				Manager.Servers.Store(s.Id, s)
+				go s.ReadAndWrite()
 			}
-		}
-	}
-}
-
-var addr = flag.String("addr", "https://openapi-sandbox.kucoin.com/api/v1/bullet-public", "http service address")
-
-func GetExchangeData() {
-
-	interrupt := make(chan os.Signal, 1)
-	signal.Notify(interrupt, os.Interrupt)
-
-	u := url.URL{Scheme: "ws", Host: *addr, Path: "/echo"}
-	log.Logger.Sugar().Infof("connecting to %s", u.String())
-
-	c, _, err := websocket.DefaultDialer.Dial(u.String(), nil)
-	if err != nil {
-		log.Logger.Sugar().Error("dial:", err)
-		return
-	}
-	defer c.Close()
-
-	done := make(chan struct{})
-
-	go func() {
-		defer close(done)
-		for {
-			_, message, err := c.ReadMessage()
-			if err != nil {
-				log.Logger.Sugar().Info("read:", err)
-				return
+		case price, ok := <-kucoin.PlgrPriceChain:
+			if ok {
+				Manager.Servers.Range(func(key, value interface{}) bool {
+					value.(*Server).SendToClient(price, SuccessCode)
+					return true
+				})
 			}
-			log.Logger.Sugar().Info("recv: %s", message)
-		}
-	}()
-
-	ticker := time.NewTicker(time.Second)
-	defer ticker.Stop()
-
-	for {
-		select {
-		case <-done:
-			return
-		case t := <-ticker.C:
-			err := c.WriteMessage(websocket.TextMessage, []byte(t.String()))
-			if err != nil {
-				log.Logger.Sugar().Error("write:", err)
-				return
-			}
-		case <-interrupt:
-			log.Logger.Info("interrupt")
-
-			// Cleanly close the connection by sending a close message and then
-			// waiting (with timeout) for the server to close the connection.
-			err := c.WriteMessage(websocket.CloseMessage, websocket.FormatCloseMessage(websocket.CloseNormalClosure, ""))
-			if err != nil {
-				log.Logger.Sugar().Error("write close:", err)
-				return
-			}
-			select {
-			case <-done:
-			case <-time.After(time.Second):
-			}
-			return
 		}
 	}
 }

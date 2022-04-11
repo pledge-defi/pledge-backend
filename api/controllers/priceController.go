@@ -4,14 +4,9 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/gorilla/websocket"
 	"net/http"
-	"pledge-backend/api/common/statecode"
-	"pledge-backend/api/models"
-	"pledge-backend/api/models/request"
-	"pledge-backend/api/models/response"
 	"pledge-backend/api/models/ws"
-	"pledge-backend/api/services"
-	"pledge-backend/api/validate"
 	"pledge-backend/log"
+	"pledge-backend/utils"
 	"time"
 )
 
@@ -40,42 +35,31 @@ func (c *PriceController) NewPrice(ctx *gin.Context) {
 		return
 	}
 
+	ramdomId := ""
+	remoteIP, ok := ctx.RemoteIP()
+	if ok {
+		ramdomId = remoteIP.String() + "-" + utils.GetRandomString(10)
+	} else {
+		ramdomId = utils.GetRandomString(30)
+	}
+
 	server := &ws.Server{
-		Id:       ctx.Request.RemoteAddr,
+		Id:       ramdomId,
 		Socket:   conn,
 		Send:     make(chan []byte, 800),
 		LastTime: time.Now().Unix(),
 	}
 
-	for true {
-		select {
-		case ws.ServerChain <- server:
-			log.Logger.Info(server.Id + " connect success !")
-		case <-time.After(time.Second * 3):
-			server.SendToClient([]byte("server busy, please try later"))
-			log.Logger.Error("server busy, please try later")
-			return
-		}
-	}
-}
-
-func (c *PriceController) PoolDataInfo(ctx *gin.Context) {
-	res := response.Gin{Res: ctx}
-	req := request.PoolDataInfo{}
-	var result []models.PoolDataInfoRes
-
-	errCode := validate.NewPoolDataInfo().PoolDataInfo(ctx, &req)
-	if errCode != statecode.COMMON_SUCCESS {
-		res.Response(ctx, errCode, nil)
-		return
-	}
-
-	errCode = services.NewPool().PoolDataInfo(req.ChainId, &result)
-	if errCode != statecode.COMMON_SUCCESS {
-		res.Response(ctx, errCode, nil)
-		return
-	}
-
-	res.Response(ctx, statecode.COMMON_SUCCESS, result)
-	return
+	server.ReadAndWrite()
+	//
+	//for true {
+	//	select {
+	//	case ws.ServerChain <- server:
+	//		log.Logger.Info(server.Id + " ws connect ... ")
+	//	case <-time.After(time.Second * 3):
+	//		server.SendToClient([]byte("server busy, please try later"))
+	//		log.Logger.Error("server busy, please try later")
+	//		return
+	//	}
+	//}
 }
