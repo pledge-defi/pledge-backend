@@ -5,6 +5,7 @@ import (
 	"pledge-backend/db"
 	"pledge-backend/schedule/services/sv21"
 	"pledge-backend/schedule/services/sv22"
+	"time"
 )
 
 func TaskV21() {
@@ -23,6 +24,7 @@ func TaskV21() {
 
 	//run pool task v22
 	s := gocron.NewScheduler()
+	s.ChangeLoc(time.UTC)
 	s.Every(2).Minutes().Do(sv21.NewPool().UpdateAllPoolInfo)
 	s.Every(1).Minute().Do(sv21.NewTokenPrice().UpdateContractPrice)
 	s.Every(2).Hours().Do(sv21.NewTokenSymbol().UpdateContractSymbol)

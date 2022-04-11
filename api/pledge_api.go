@@ -3,6 +3,8 @@ package main
 import (
 	"github.com/gin-gonic/gin"
 	"pledge-backend/api/middlewares"
+	"pledge-backend/api/models/kucoin"
+	"pledge-backend/api/models/ws"
 	"pledge-backend/api/routes"
 	"pledge-backend/api/static"
 	"pledge-backend/api/validate"
@@ -20,6 +22,12 @@ func main() {
 
 	//gin bind go-playground-validator
 	validate.BindingValidator()
+
+	// websocket server
+	go ws.StartServer()
+
+	// get plgr price from kucoin-exchange
+	go kucoin.GetExchangePrice()
 
 	// gin start
 	gin.SetMode(gin.ReleaseMode)

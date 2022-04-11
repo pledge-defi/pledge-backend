@@ -20,6 +20,10 @@ func InitRoute(e *gin.Engine) *gin.Engine {
 	v2Group.POST("/pool/debtTokenList", middlewares.CheckToken(), poolController.DebtTokenList) //pool debtTokenList
 	v2Group.POST("/pool/search", middlewares.CheckToken(), poolController.Search)               //pool search
 
+	// plgr-usdt price
+	priceController := controllers.PriceController{}
+	v2Group.POST("/price", middlewares.CheckToken(), priceController.NewPrice) //new price on ku-coin-exchange
+
 	// pledge-defi admin backend
 	mutiSignPoolController := controllers.MutiSignPoolController{}
 	v2Group.POST("/pool/setMultiSign", middlewares.CheckToken(), mutiSignPoolController.SetMultiSign) //multi-sign set
