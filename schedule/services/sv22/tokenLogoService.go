@@ -42,7 +42,7 @@ func (s *TokenLogo) UpdateTokenLogo() {
 			}
 
 			if hasNewData {
-				err = s.SaveLogoData(t.Address, utils.IntToString(t.ChainID), t.LogoURI, t.Symbol)
+				err = s.SaveLogoData(t.Address, utils.IntToString(t.ChainID), t.LogoURI, t.Symbol, t.Decimals)
 				if err != nil {
 					log.Logger.Sugar().Error("UpdateTokenLogo SaveLogoData err ", err)
 					continue
@@ -63,7 +63,7 @@ func (s *TokenLogo) UpdateTokenLogo() {
 			}
 
 			if hasNewData {
-				err = s.SaveLogoData(t["token"], t["chain_id"], t["logo"], t["symbol"])
+				err = s.SaveLogoData(t["token"], t["chain_id"], t["logo"], t["symbol"], utils.StringToInt(t["decimals"]))
 				if err != nil {
 					log.Logger.Sugar().Error("UpdateTokenLogo SaveLogoData err ", err)
 					continue
@@ -139,12 +139,13 @@ func (s *TokenLogo) CheckTokenInfo(token, chainId string) error {
 }
 
 // SaveLogoData Saving logo data to mysql if it has new logo
-func (s *TokenLogo) SaveLogoData(token, chainId, logoUrl, symbol string) error {
+func (s *TokenLogo) SaveLogoData(token, chainId, logoUrl, symbol string, decimals int) error {
 	nowDateTime := utils.GetCurDateTimeFormat()
 
 	err := db.Mysql.Table("token_info").Where("token=? and chain_id=? ", token, chainId).Updates(map[string]interface{}{
 		"symbol":     symbol,
 		"logo":       logoUrl,
+		"decimals":   decimals,
 		"updated_at": nowDateTime,
 	}).Debug().Error
 	if err != nil {
@@ -173,12 +174,14 @@ var LocalTokenLogo = map[string]map[string]map[string]string{
 	"BNB": {
 		"test_net": {
 			"chain_id": "97",
+			"decimals": "18",
 			"token":    "0x0000000000000000000000000000000000000000",
 			"symbol":   "BNB",
 			"logo":     BaseUrl + "storage/img/BNB.png",
 		},
 		"main_net": {
 			"chain_id": "56",
+			"decimals": "18",
 			"token":    "0x0000000000000000000000000000000000000000",
 			"symbol":   "BNB",
 			"logo":     BaseUrl + "storage/img/BNB.png",
@@ -187,12 +190,14 @@ var LocalTokenLogo = map[string]map[string]map[string]string{
 	"BTC": {
 		"test_net": {
 			"chain_id": "97",
+			"decimals": "8",
 			"token":    "0xB5514a4FA9dDBb48C3DE215Bc9e52d9fCe2D8658",
 			"symbol":   "BTC",
 			"logo":     BaseUrl + "storage/img/BTC.png",
 		},
 		"main_net": {
 			"chain_id": "56",
+			"decimals": "8",
 			"token":    "0x7130d2A12B9BCbFAe4f2634d864A1Ee1Ce3Ead9c",
 			"symbol":   "BTC",
 			"logo":     BaseUrl + "storage/img/BTC.png",
@@ -201,12 +206,14 @@ var LocalTokenLogo = map[string]map[string]map[string]string{
 	"BTCB": {
 		"test_net": {
 			"chain_id": "97",
+			"decimals": "8",
 			"token":    "0xB5514a4FA9dDBb48C3DE215Bc9e52d9fCe2D8658",
 			"symbol":   "BTC",
 			"logo":     BaseUrl + "storage/img/BTC.png",
 		},
 		"main_net": {
 			"chain_id": "56",
+			"decimals": "8",
 			"token":    "0x7130d2A12B9BCbFAe4f2634d864A1Ee1Ce3Ead9c",
 			"symbol":   "BTC",
 			"logo":     BaseUrl + "storage/img/BTC.png",
@@ -215,12 +222,14 @@ var LocalTokenLogo = map[string]map[string]map[string]string{
 	"BUSD": {
 		"test_net": {
 			"chain_id": "97",
+			"decimals": "18",
 			"token":    "0xE676Dcd74f44023b95E0E2C6436C97991A7497DA",
 			"symbol":   "BUSD",
 			"logo":     BaseUrl + "storage/img/BUSD.png",
 		},
 		"main_net": {
 			"chain_id": "56",
+			"decimals": "18",
 			"token":    "0xe9e7CEA3DedcA5984780Bafc599bD69ADd087D56",
 			"symbol":   "BUSD",
 			"logo":     BaseUrl + "storage/img/BUSD.png",
@@ -229,12 +238,14 @@ var LocalTokenLogo = map[string]map[string]map[string]string{
 	"DAI": {
 		"test_net": {
 			"chain_id": "97",
+			"decimals": "18",
 			"token":    "0x490BC3FCc845d37C1686044Cd2d6589585DE9B8B",
 			"symbol":   "DAI",
 			"logo":     BaseUrl + "storage/img/DAI.png",
 		},
 		"main_net": {
 			"chain_id": "56",
+			"decimals": "18",
 			"token":    "0x1AF3F329e8BE154074D8769D1FFa4eE058B1DBc3",
 			"symbol":   "DAI",
 			"logo":     BaseUrl + "storage/img/DAI.png",
@@ -243,12 +254,14 @@ var LocalTokenLogo = map[string]map[string]map[string]string{
 	"ETH": {
 		"test_net": {
 			"chain_id": "97",
+			"decimals": "18",
 			"token":    "",
 			"symbol":   "ETH",
 			"logo":     BaseUrl + "storage/img/ETH.png",
 		},
 		"main_net": {
 			"chain_id": "56",
+			"decimals": "18",
 			"token":    "0x2170ed0880ac9a755fd29b2688956bd959f933f8",
 			"symbol":   "ETH",
 			"logo":     BaseUrl + "storage/img/ETH.png",
@@ -257,12 +270,14 @@ var LocalTokenLogo = map[string]map[string]map[string]string{
 	"USDT": {
 		"test_net": {
 			"chain_id": "97",
+			"decimals": "18",
 			"token":    "",
 			"symbol":   "USDT",
 			"logo":     BaseUrl + "storage/img/USDT.png",
 		},
 		"main_net": {
 			"chain_id": "56",
+			"decimals": "18",
 			"token":    "0x55d398326f99059ff775485246999027b3197955",
 			"symbol":   "USDT",
 			"logo":     BaseUrl + "storage/img/USDT.png",
@@ -271,12 +286,14 @@ var LocalTokenLogo = map[string]map[string]map[string]string{
 	"CAKE": {
 		"test_net": {
 			"chain_id": "97",
+			"decimals": "18",
 			"token":    "0xEAEd08168a2D34Ae2B9ea1c1f920E0BC00F9fA67",
 			"symbol":   "CAKE",
 			"logo":     BaseUrl + "storage/img/CAKE.png",
 		},
 		"main_net": {
 			"chain_id": "56",
+			"decimals": "18",
 			"token":    "0x0e09fabb73bd3ade0a17ecc321fd13a19e81ce82",
 			"symbol":   "CAKE",
 			"logo":     BaseUrl + "storage/img/CAKE.png",
@@ -285,12 +302,14 @@ var LocalTokenLogo = map[string]map[string]map[string]string{
 	"PLGR": {
 		"test_net": {
 			"chain_id": "97",
+			"decimals": "18",
 			"token":    "",
 			"symbol":   "PLGR",
 			"logo":     BaseUrl + "storage/img/PLGR.png",
 		},
 		"main_net": {
 			"chain_id": "56",
+			"decimals": "18",
 			"token":    "0x6Aa91CbfE045f9D154050226fCc830ddbA886CED",
 			"symbol":   "PLGR",
 			"logo":     BaseUrl + "storage/img/PLGR.png",

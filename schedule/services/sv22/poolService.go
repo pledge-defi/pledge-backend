@@ -23,12 +23,14 @@ func NewPool() *poolService {
 func (s *poolService) UpdateAllPoolInfo() {
 
 	s.UpdatePoolInfo(config.Config.TestNet.PledgePoolToken, config.Config.TestNet.NetUrl, config.Config.TestNet.ChainId)
+
 	s.UpdatePoolInfo(config.Config.MainNet.PledgePoolToken, config.Config.MainNet.NetUrl, config.Config.MainNet.ChainId)
 
 }
 
 func (s *poolService) UpdatePoolInfo(contractAddress, network, chainId string) {
-	log.Logger.Sugar().Info("UpdatePoolInfo", contractAddress, network)
+
+	log.Logger.Sugar().Info("UpdatePoolInfo ", contractAddress+" "+network)
 	ethereumConn, err := ethclient.Dial(network)
 	if nil != err {
 		log.Logger.Error(err.Error())
@@ -52,7 +54,10 @@ func (s *poolService) UpdatePoolInfo(contractAddress, network, chainId string) {
 		log.Logger.Error(err.Error())
 		return
 	}
+
 	for i := 0; i <= int(pLength.Int64())-1; i++ {
+
+		log.Logger.Sugar().Info("UpdatePoolInfo ", i)
 		poolId := utils.IntToString(i + 1)
 		baseInfo, err := pledgePoolToken.PledgePoolTokenCaller.PoolBaseInfo(nil, big.NewInt(int64(i)))
 		if err != nil {

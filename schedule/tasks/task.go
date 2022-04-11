@@ -16,19 +16,13 @@ func TaskV21() {
 		panic("clear redis error " + err.Error())
 	}
 
-	//Init all the jobs
-	sv21.NewPool().UpdateAllPoolInfo()
-	sv21.NewTokenPrice().UpdateContractPrice()
-	sv21.NewTokenSymbol().UpdateContractSymbol()
-	sv21.NewTokenLogo().UpdateTokenLogo()
-
-	//run pool task v22
+	//run pool task v21
 	s := gocron.NewScheduler()
 	s.ChangeLoc(time.UTC)
-	s.Every(2).Minutes().Do(sv21.NewPool().UpdateAllPoolInfo)
-	s.Every(1).Minute().Do(sv21.NewTokenPrice().UpdateContractPrice)
-	s.Every(2).Hours().Do(sv21.NewTokenSymbol().UpdateContractSymbol)
-	s.Every(2).Hours().Do(sv21.NewTokenLogo().UpdateTokenLogo)
+	s.Every(2).Minutes().From(gocron.NextTick()).Do(sv21.NewPool().UpdateAllPoolInfo)
+	s.Every(1).Minute().From(gocron.NextTick()).Do(sv21.NewTokenPrice().UpdateContractPrice)
+	s.Every(2).Hours().From(gocron.NextTick()).Do(sv21.NewTokenSymbol().UpdateContractSymbol)
+	s.Every(2).Hours().From(gocron.NextTick()).Do(sv21.NewTokenLogo().UpdateTokenLogo)
 	s.Every(30).Minutes().From(gocron.NextTick()).Do(sv21.NewBalanceMonitor().Monitor)
 	<-s.Start() // Start all the pending jobs
 
@@ -42,18 +36,12 @@ func TaskV22() {
 		panic("clear redis error " + err.Error())
 	}
 
-	//Init all the jobs
-	sv22.NewPool().UpdateAllPoolInfo()
-	sv22.NewTokenPrice().UpdateContractPrice()
-	sv22.NewTokenSymbol().UpdateContractSymbol()
-	sv22.NewTokenLogo().UpdateTokenLogo()
-
 	//run pool task v22
 	s := gocron.NewScheduler()
-	s.Every(2).Minutes().Do(sv22.NewPool().UpdateAllPoolInfo)
-	s.Every(1).Minute().Do(sv22.NewTokenPrice().UpdateContractPrice)
-	s.Every(2).Hours().Do(sv22.NewTokenSymbol().UpdateContractSymbol)
-	s.Every(2).Hours().Do(sv22.NewTokenLogo().UpdateTokenLogo)
+	s.Every(2).Minutes().From(gocron.NextTick()).Do(sv22.NewPool().UpdateAllPoolInfo)
+	s.Every(1).Minute().From(gocron.NextTick()).Do(sv22.NewTokenPrice().UpdateContractPrice)
+	s.Every(2).Hours().From(gocron.NextTick()).Do(sv22.NewTokenSymbol().UpdateContractSymbol)
+	s.Every(2).Hours().From(gocron.NextTick()).Do(sv22.NewTokenLogo().UpdateTokenLogo)
 	s.Every(30).Minutes().From(gocron.NextTick()).Do(sv22.NewBalanceMonitor().Monitor)
 	<-s.Start() // Start all the pending jobs
 }

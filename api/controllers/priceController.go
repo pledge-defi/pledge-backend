@@ -51,5 +51,5 @@ func (c *PriceController) NewPrice(ctx *gin.Context) {
 		LastTime: time.Now().Unix(),
 	}
 
-	server.ReadAndWrite()
+	go server.ReadAndWrite()
 }

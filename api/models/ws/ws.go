@@ -53,7 +53,7 @@ func (s *Server) SendToClient(data string, code int) {
 
 func (s *Server) ReadAndWrite() {
 
-	errChian := make(chan error)
+	errChan := make(chan error)
 
 	Manager.Servers.Store(s.Id, s)
 
@@ -63,8 +63,7 @@ func (s *Server) ReadAndWrite() {
 			select {
 			case message, ok := <-s.Send:
 				if !ok {
-					Manager.Servers.Delete(s)
-					errChian <- errors.New("write message error")
+					errChan <- errors.New("write message error")
 					return
 				}
 				s.SendToClient(string(message), SuccessCode)
@@ -78,14 +77,13 @@ func (s *Server) ReadAndWrite() {
 			_, message, err := s.Socket.ReadMessage()
 			if err != nil {
 				log.Logger.Sugar().Error(s.Id+" ReadMessage err ", err)
-				errChian <- err
+				errChan <- err
 				return
 			}
 			//update ping time
 			if string(message) == "ping" || string(message) == `"ping"` || string(message) == "'ping'" {
 				s.LastTime = time.Now().Unix()
 				s.SendToClient("pong", SuccessCode)
-				//s.Send <- []byte("pong")
 			}
 			continue
 		}
@@ -97,13 +95,12 @@ func (s *Server) ReadAndWrite() {
 		case <-time.After(time.Second):
 			if time.Now().Unix()-s.LastTime >= UserPingPongDurTime {
 				s.SendToClient("ping timeout", ErrorCode)
-				log.Logger.Sugar().Error(s.Id, " ReadAndWrite returned timeout")
 				Manager.Servers.Delete(s)
 				s.Socket.Close()
 				close(s.Send)
 				return
 			}
-		case err := <-errChian:
+		case err := <-errChan:
 			log.Logger.Sugar().Error(s.Id, " ReadAndWrite returned ", err)
 			return
 
