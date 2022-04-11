@@ -51,16 +51,5 @@ func (c *PriceController) NewPrice(ctx *gin.Context) {
 		LastTime: time.Now().Unix(),
 	}
 
-	//server.ReadAndWrite()
-
-	for true {
-		select {
-		case ws.ServerChain <- server:
-			log.Logger.Info(server.Id + " ws connect ... ")
-		case <-time.After(time.Second * 3):
-			server.SendToClient("server busy, please try later", ws.SuccessCode)
-			log.Logger.Error("server busy, please try later")
-			return
-		}
-	}
+	server.ReadAndWrite()
 }

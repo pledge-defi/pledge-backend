@@ -35,7 +35,6 @@ type Message struct {
 
 var Manager = ServerManager{}
 var UserPingPongDurTime int64 = 20 // seconds
-var ServerChain = make(chan *Server)
 
 func (s *Server) SendToClient(data string, code int) {
 	s.Lock()
@@ -112,11 +111,6 @@ func StartServer() {
 	log.Logger.Info("WsServer start")
 	for {
 		select {
-		case s, ok := <-ServerChain:
-			if ok {
-				Manager.Servers.Store(s.Id, s)
-				go s.ReadAndWrite()
-			}
 		case price, ok := <-kucoin.PlgrPriceChain:
 			if ok {
 				Manager.Servers.Range(func(key, value interface{}) bool {
