@@ -4,7 +4,6 @@ import (
 	"encoding/json"
 	"errors"
 	"github.com/gorilla/websocket"
-	"golang.org/x/sync/errgroup"
 	"pledge-backend/api/models/kucoin"
 	"pledge-backend/log"
 	"sync"
@@ -54,29 +53,31 @@ func (s *Server) SendToClient(data string, code int) {
 
 func (s *Server) ReadAndWrite() {
 
-	eg := errgroup.Group{}
+	errChian := make(chan error)
 
 	//write
-	eg.Go(func() error {
+	go func() {
 		for {
 			select {
 			case message, ok := <-s.Send:
 				if !ok {
 					Manager.Servers.Delete(s)
-					return errors.New("write message error")
+					errChian <- errors.New("write message error")
+					return
 				}
 				s.SendToClient(string(message), SuccessCode)
 			}
 		}
-	})
+	}()
 
 	//read
-	eg.Go(func() error {
+	go func() {
 		for {
 			_, message, err := s.Socket.ReadMessage()
 			if err != nil {
 				log.Logger.Sugar().Error(s.Id+" ReadMessage err ", err)
-				return err
+				errChian <- err
+				return
 			}
 			//update ping time
 			if string(message) == "ping" || string(message) == `"ping"` || string(message) == "'ping'" {
@@ -85,28 +86,26 @@ func (s *Server) ReadAndWrite() {
 			}
 			continue
 		}
-	})
+	}()
 
 	//check ping pong
-	eg.Go(func() error {
-		for {
-			select {
-			case <-time.After(time.Second):
-				if time.Now().Unix()-s.LastTime >= UserPingPongDurTime {
-					s.SendToClient("ping timeout", ErrorCode)
-					log.Logger.Info(s.Id + " timeout")
-					Manager.Servers.Delete(s)
-					return errors.New("ping timeout")
-				}
+	for {
+		select {
+		case <-time.After(time.Second):
+			if time.Now().Unix()-s.LastTime >= UserPingPongDurTime {
+				s.SendToClient("ping timeout", ErrorCode)
+				log.Logger.Sugar().Error(s.Id, " ReadAndWrite returned timeout")
+				Manager.Servers.Delete(s)
+				s.Socket.Close()
+				close(s.Send)
+				return
 			}
+		case err := <-errChian:
+			log.Logger.Sugar().Error(s.Id, " ReadAndWrite returned ", err)
+			return
+
 		}
-	})
-
-	if err := eg.Wait(); err != nil {
-		log.Logger.Sugar().Error(s.Id, " ReadAndWrite returned ", err)
-		return
 	}
-
 }
 
 func StartServer() {
