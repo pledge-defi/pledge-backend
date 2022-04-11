@@ -113,7 +113,7 @@ func (s *Server) ReadAndWrite() {
 }
 
 func StartServer() {
-	log.Logger.Info("StartWsServer start")
+	log.Logger.Info("WsServer start")
 	for {
 		select {
 		case conn, ok := <-ServerChain:

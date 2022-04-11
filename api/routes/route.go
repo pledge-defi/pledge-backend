@@ -22,7 +22,7 @@ func InitRoute(e *gin.Engine) *gin.Engine {
 
 	// plgr-usdt price
 	priceController := controllers.PriceController{}
-	v2Group.POST("/price", middlewares.CheckToken(), priceController.NewPrice) //new price on ku-coin-exchange
+	v2Group.GET("/price", middlewares.CheckToken(), priceController.NewPrice) //new price on ku-coin-exchange
 
 	// pledge-defi admin backend
 	mutiSignPoolController := controllers.MutiSignPoolController{}
