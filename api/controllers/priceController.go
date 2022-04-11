@@ -7,6 +7,7 @@ import (
 	"pledge-backend/api/models/ws"
 	"pledge-backend/log"
 	"pledge-backend/utils"
+	"strings"
 	"time"
 )
 
@@ -38,9 +39,9 @@ func (c *PriceController) NewPrice(ctx *gin.Context) {
 	ramdomId := ""
 	remoteIP, ok := ctx.RemoteIP()
 	if ok {
-		ramdomId = remoteIP.String() + "-" + utils.GetRandomString(10)
+		ramdomId = strings.Replace(remoteIP.String(), ".", "_", -1) + "_" + utils.GetRandomString(23)
 	} else {
-		ramdomId = utils.GetRandomString(30)
+		ramdomId = utils.GetRandomString(32)
 	}
 
 	server := &ws.Server{

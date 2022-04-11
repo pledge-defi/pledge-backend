@@ -50,10 +50,10 @@ func GetExchangePrice() {
 	}
 
 	ch := kucoin.NewSubscribeMessage("/market/ticker:PLGR-USDT", false)
+	uch := kucoin.NewUnsubscribeMessage("/market/ticker:PLGR-USDT", false)
 
-	//if err := c.Subscribe(ch1, ch2); err != nil {
 	if err := c.Subscribe(ch); err != nil {
-		// Handle error
+		log.Logger.Error(err.Error()) // Handle error
 		return
 	}
 
@@ -62,6 +62,7 @@ func GetExchangePrice() {
 		case err := <-ec:
 			c.Stop() // Stop subscribing the WebSocket feed
 			log.Logger.Sugar().Errorf("Error: %s", err.Error())
+			c.Unsubscribe(uch)
 			return
 		case msg := <-mc:
 			t := &kucoin.TickerLevel1Model{}
