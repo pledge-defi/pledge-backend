@@ -5,6 +5,7 @@ import (
 	"errors"
 	"github.com/gorilla/websocket"
 	"pledge-backend/api/models/kucoin"
+	"pledge-backend/config"
 	"pledge-backend/log"
 	"sync"
 	"time"
@@ -34,7 +35,7 @@ type Message struct {
 }
 
 var Manager = ServerManager{}
-var UserPingPongDurTime int64 = 20 // seconds
+var UserPingPongDurTime = config.Config.Env.WssTimeoutDuration // seconds
 
 func (s *Server) SendToClient(data string, code int) {
 	s.Lock()
@@ -83,7 +84,8 @@ func (s *Server) ReadAndWrite() {
 			//update ping time
 			if string(message) == "ping" || string(message) == `"ping"` || string(message) == "'ping'" {
 				s.LastTime = time.Now().Unix()
-				s.Send <- []byte("pong")
+				s.SendToClient("pong", SuccessCode)
+				//s.Send <- []byte("pong")
 			}
 			continue
 		}

@@ -21,6 +21,7 @@ type EnvConfig struct {
 	Protocol           string `toml:"protocol"`
 	DomainName         string `toml:"domain_name"`
 	TaskDuration       int64  `toml:"task_duration"`
+	WssTimeoutDuration int64  `toml:"wss_timeout_duration"`
 	TaskExtendDuration int64  `toml:"task_extend_duration"`
 }
 

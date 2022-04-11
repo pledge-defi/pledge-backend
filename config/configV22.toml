@@ -47,7 +47,9 @@ secret_key = "243223ffslsfsldfl412fdsfsdf"
 port = "8080"
 version = "22"
 protocol = "https"
-task_duration = 30
+task_duration = 2
+task_extend_duration = 5
+wss_timeout_duration = 20
 domain_name = "v2-backend.pledger.finance"
 
 [threshold]

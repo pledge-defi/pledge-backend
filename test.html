@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+</head>
+<body>
+<div id="msg"></div>
+</body>
+</html>
+<script>
+
+    // const ws = new WebSocket("wss://dev-v2-backend.pledger.finance/api/v21/price");
+    const ws = new WebSocket("ws://127.0.0.1:8080/api/v21/price");
+
+
+    let msg = "'ping'"
+
+    ws.onopen = function (evt) {
+        console.log("Connection open ...");
+    };
+
+    ws.onmessage = function (evt) {
+        console.log("Received Message: " + evt.data);
+        ws.close();
+    };
+
+    ws.onclose = function (evt) {
+        console.log("Connection closed.")
+    }
+
+    setInterval(function () {
+        ws.send(msg)
+    }, 10000)
+
+</script>

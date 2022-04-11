@@ -49,6 +49,7 @@ version = "21"
 protocol = "https"
 task_duration = 2
 task_extend_duration = 5
+wss_timeout_duration = 20
 domain_name = "dev-v2-backend.pledger.finance"
 
 [threshold]
