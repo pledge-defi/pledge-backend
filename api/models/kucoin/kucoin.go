@@ -42,7 +42,6 @@ func GetExchangePrice() {
 	}
 
 	ch := kucoin.NewSubscribeMessage("/market/ticker:PLGR-USDT", false)
-	uch := kucoin.NewUnsubscribeMessage("/market/ticker:PLGR-USDT", false)
 
 	//if err := c.Subscribe(ch1, ch2); err != nil {
 	if err := c.Subscribe(ch); err != nil {
@@ -50,7 +49,6 @@ func GetExchangePrice() {
 		return
 	}
 
-	var i = 0
 	for {
 		select {
 		case err := <-ec:
@@ -66,28 +64,6 @@ func GetExchangePrice() {
 				return
 			}
 			log.Logger.Sugar().Infof("Ticker: %s, %s, %s, %s", msg.Topic, t.Sequence, t.Price, t.Size)
-			i++
-			if i == 5 {
-				log.Logger.Sugar().Info("Unsubscribe PLGR-USDT")
-				if err = c.Unsubscribe(uch); err != nil {
-					log.Logger.Sugar().Errorf("Error: %s", err.Error())
-					// Handle error
-					return
-				}
-			}
-			if i == 10 {
-				log.Logger.Info("Subscribe PLGR-USDT")
-				if err = c.Subscribe(ch); err != nil {
-					log.Logger.Sugar().Errorf("Error: %s", err.Error())
-					// Handle error
-					return
-				}
-			}
-			if i == 15 {
-				log.Logger.Info("Exit subscription")
-				c.Stop() // Stop subscribing the WebSocket feed
-				return
-			}
 		}
 	}
 }
