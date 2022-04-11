@@ -3,6 +3,7 @@ package ws
 import (
 	"encoding/json"
 	"errors"
+	"fmt"
 	"github.com/gorilla/websocket"
 	"pledge-backend/api/models/kucoin"
 	"pledge-backend/log"
@@ -114,6 +115,7 @@ func StartServer() {
 		case price, ok := <-kucoin.PlgrPriceChain:
 			if ok {
 				Manager.Servers.Range(func(key, value interface{}) bool {
+					fmt.Println(key.(string))
 					value.(*Server).SendToClient(price, SuccessCode)
 					return true
 				})
