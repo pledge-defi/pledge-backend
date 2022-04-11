@@ -44,7 +44,7 @@ expire_time = 2592000
 secret_key = "243223ffslsfsldfl412fdsfsdf"
 
 [env]
-port = "8088"
+port = "8080"
 version = "21"
 protocol = "https"
 task_duration = 2
