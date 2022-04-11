@@ -55,6 +55,8 @@ func (s *Server) ReadAndWrite() {
 
 	errChian := make(chan error)
 
+	Manager.Servers.Store(s.Id, s)
+
 	//write
 	go func() {
 		for {
@@ -113,6 +115,7 @@ func StartServer() {
 	for {
 		select {
 		case price, ok := <-kucoin.PlgrPriceChain:
+			fmt.Println(price, ok, 999888)
 			if ok {
 				Manager.Servers.Range(func(key, value interface{}) bool {
 					fmt.Println(key.(string))
