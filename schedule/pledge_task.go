@@ -9,10 +9,10 @@ func main() {
 	// init mysql
 	db.InitMysql()
 
-	//init redis
+	// init redis
 	db.InitRedis()
 
-	//run pool task
+	// pool task
 	tasks.Task()
 
 }
