@@ -1,4 +1,4 @@
-package sv22
+package services
 
 import (
 	"encoding/json"
@@ -7,7 +7,7 @@ import (
 	"github.com/ethereum/go-ethereum/ethclient"
 	"gorm.io/gorm"
 	"pledge-backend/config"
-	tokengo "pledge-backend/contract/bindings/tokenv22"
+	"pledge-backend/contract/bindings"
 	"pledge-backend/db"
 	"pledge-backend/log"
 	"pledge-backend/schedule/models"
@@ -33,7 +33,7 @@ func (s *TokenPrice) UpdateContractPrice() {
 		if t.Token == "" {
 			log.Logger.Sugar().Error("UpdateContractPrice token empty ", t.Symbol, t.ChainId)
 			continue
-		} else if strings.ToUpper(t.Token) == config.Config.MainNet.PlgrAddress { // get PLGR price
+		} else if strings.ToUpper(t.Token) == config.Config.TestNet.PlgrAddress { // get PLGR price
 			priceStr, _ := db.RedisGetString("plgr_price")
 			priceF := utils.StringToFloat64(priceStr)
 			price = int64(priceF * 1000000000000000000)
@@ -76,7 +76,7 @@ func (s *TokenPrice) GetMainNetTokenPrice(token string) (error, int64) {
 		return err, 0
 	}
 
-	bscPledgeOracleMainNetToken, err := tokengo.NewBscPledgeOracleMainnetToken(common.HexToAddress(config.Config.MainNet.BscPledgeOracleToken), ethereumConn)
+	bscPledgeOracleMainNetToken, err := bindings.NewBscPledgeOracleMainnetToken(common.HexToAddress(config.Config.MainNet.BscPledgeOracleToken), ethereumConn)
 	if nil != err {
 		log.Logger.Error(err.Error())
 		return err, 0
@@ -99,7 +99,7 @@ func (s *TokenPrice) GetTestNetTokenPrice(token string) (error, int64) {
 		return err, 0
 	}
 
-	bscPledgeOracleTestnetToken, err := tokengo.NewBscPledgeOracleTestnetToken(common.HexToAddress(config.Config.TestNet.BscPledgeOracleToken), ethereumConn)
+	bscPledgeOracleTestnetToken, err := bindings.NewBscPledgeOracleTestnetToken(common.HexToAddress(config.Config.TestNet.BscPledgeOracleToken), ethereumConn)
 	if nil != err {
 		log.Logger.Error(err.Error())
 		return err, 0

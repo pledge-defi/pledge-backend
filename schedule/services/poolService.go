@@ -1,4 +1,4 @@
-package sv21
+package services
 
 import (
 	"encoding/json"
@@ -6,7 +6,7 @@ import (
 	"github.com/ethereum/go-ethereum/ethclient"
 	"math/big"
 	"pledge-backend/config"
-	tokengo "pledge-backend/contract/bindings/tokenv21"
+	"pledge-backend/contract/bindings"
 	"pledge-backend/db"
 	"pledge-backend/log"
 	"pledge-backend/schedule/models"
@@ -36,7 +36,7 @@ func (s *poolService) UpdatePoolInfo(contractAddress, network, chainId string) {
 		log.Logger.Error(err.Error())
 		return
 	}
-	pledgePoolToken, err := tokengo.NewPledgePoolToken(common.HexToAddress(contractAddress), ethereumConn)
+	pledgePoolToken, err := bindings.NewPledgePoolToken(common.HexToAddress(contractAddress), ethereumConn)
 	if nil != err {
 		log.Logger.Error(err.Error())
 		return

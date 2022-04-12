@@ -12,16 +12,12 @@ func main() {
 	//init redis
 	db.InitRedis()
 
-	//run pool task v21
-	tasks.TaskV21()
-
-	//run pool task v22
-	//tasks.TaskV22()
+	//run pool task
+	tasks.Task()
 
 }
 
 /*
- If you change the version, you need to modify the following files
- pledge_task.go
+ If you change the version, you need to modify the following files'
  config/init.go
 */
