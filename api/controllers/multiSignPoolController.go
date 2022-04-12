@@ -10,10 +10,10 @@ import (
 	"pledge-backend/log"
 )
 
-type MutiSignPoolController struct {
+type MultiSignPoolController struct {
 }
 
-func (c *MutiSignPoolController) SetMultiSign(ctx *gin.Context) {
+func (c *MultiSignPoolController) SetMultiSign(ctx *gin.Context) {
 	res := response.Gin{Res: ctx}
 	req := request.SetMultiSign{}
 	log.Logger.Sugar().Info("SetMultiSign req ", req)
@@ -35,7 +35,7 @@ func (c *MutiSignPoolController) SetMultiSign(ctx *gin.Context) {
 	return
 }
 
-func (c *MutiSignPoolController) GetMultiSign(ctx *gin.Context) {
+func (c *MultiSignPoolController) GetMultiSign(ctx *gin.Context) {
 	res := response.Gin{Res: ctx}
 	req := request.GetMultiSign{}
 	result := response.MultiSign{}

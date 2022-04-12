@@ -25,9 +25,9 @@ func InitRoute(e *gin.Engine) *gin.Engine {
 	v2Group.GET("/price", priceController.NewPrice) //new price on ku-coin-exchange
 
 	// pledge-defi admin backend
-	mutiSignPoolController := controllers.MutiSignPoolController{}
-	v2Group.POST("/pool/setMultiSign", middlewares.CheckToken(), mutiSignPoolController.SetMultiSign) //multi-sign set
-	v2Group.POST("/pool/getMultiSign", middlewares.CheckToken(), mutiSignPoolController.GetMultiSign) //multi-sign get
+	multiSignPoolController := controllers.MultiSignPoolController{}
+	v2Group.POST("/pool/setMultiSign", middlewares.CheckToken(), multiSignPoolController.SetMultiSign) //multi-sign set
+	v2Group.POST("/pool/getMultiSign", middlewares.CheckToken(), multiSignPoolController.GetMultiSign) //multi-sign get
 
 	userController := controllers.UserController{}
 	v2Group.POST("/user/login", userController.Login)                             // login
