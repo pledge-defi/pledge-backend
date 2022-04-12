@@ -36,7 +36,7 @@
     let msg, i = 0;
     const loop = setInterval(function () {
         msg = "ping";
-        if (websocket.readyState == WebSocket.OPEN) {
+        if (websocket.readyState === WebSocket.OPEN) {
             websocket.send(msg);
             console.log('send: ' + msg);
         } else {

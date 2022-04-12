@@ -57,6 +57,12 @@ func (s *Server) ReadAndWrite() {
 
 	Manager.Servers.Store(s.Id, s)
 
+	defer func() {
+		Manager.Servers.Delete(s)
+		s.Socket.Close()
+		close(s.Send)
+	}()
+
 	//write
 	go func() {
 		for {
@@ -95,15 +101,11 @@ func (s *Server) ReadAndWrite() {
 		case <-time.After(time.Second):
 			if time.Now().Unix()-s.LastTime >= UserPingPongDurTime {
 				s.SendToClient("ping timeout", ErrorCode)
-				Manager.Servers.Delete(s)
-				s.Socket.Close()
-				close(s.Send)
 				return
 			}
 		case err := <-errChan:
 			log.Logger.Sugar().Error(s.Id, " ReadAndWrite returned ", err)
 			return
-
 		}
 	}
 }
