@@ -12,6 +12,7 @@ import (
 	"pledge-backend/log"
 	"pledge-backend/schedule/models"
 	"pledge-backend/utils"
+	"strings"
 )
 
 type TokenPrice struct{}
@@ -32,9 +33,9 @@ func (s *TokenPrice) UpdateContractPrice() {
 		if t.Token == "" {
 			log.Logger.Sugar().Error("UpdateContractPrice token empty ", t.Symbol, t.ChainId)
 			continue
-		} else if t.Token == config.Config.Env.PlgrAddress { // get PLGR price
+		} else if strings.ToUpper(t.Token) == config.Config.Env.PlgrAddress { // get PLGR price
 			priceStr, _ := db.RedisGetString("plgr_price")
-			price = utils.StringToInt64(priceStr)
+			price = utils.StringToInt64(priceStr) * 1000000000000000000
 		} else {
 			if t.ChainId == "97" {
 				err, price = s.GetTestNetTokenPrice(t.Token)
