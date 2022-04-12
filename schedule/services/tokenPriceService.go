@@ -33,15 +33,17 @@ func (s *TokenPrice) UpdateContractPrice() {
 		if t.Token == "" {
 			log.Logger.Sugar().Error("UpdateContractPrice token empty ", t.Symbol, t.ChainId)
 			continue
-		} else if strings.ToUpper(t.Token) == config.Config.TestNet.PlgrAddress { // get PLGR price
-			priceStr, _ := db.RedisGetString("plgr_price")
-			priceF := utils.StringToFloat64(priceStr)
-			price = int64(priceF * 1000000000000000000)
 		} else {
 			if t.ChainId == "97" {
 				err, price = s.GetTestNetTokenPrice(t.Token)
 			} else if t.ChainId == "56" {
-				err, price = s.GetMainNetTokenPrice(t.Token)
+				if strings.ToUpper(t.Token) == config.Config.MainNet.PlgrAddress { // get PLGR price from ku-coin(Only main network price)
+					priceStr, _ := db.RedisGetString("plgr_price")
+					priceF := utils.StringToFloat64(priceStr)
+					price = int64(priceF * 1000000000000000000)
+				} else {
+					err, price = s.GetMainNetTokenPrice(t.Token)
+				}
 			} else {
 				log.Logger.Sugar().Error("UpdateContractPrice chain_id err ", t.Symbol, t.ChainId)
 				continue
