@@ -6,6 +6,7 @@ import (
 )
 
 func main() {
+
 	// init mysql
 	db.InitMysql()
 
