@@ -35,7 +35,8 @@ func (s *TokenPrice) UpdateContractPrice() {
 			continue
 		} else if strings.ToUpper(t.Token) == config.Config.Env.PlgrAddress { // get PLGR price
 			priceStr, _ := db.RedisGetString("plgr_price")
-			price = utils.StringToInt64(priceStr) * 1000000000000000000
+			priceF := utils.StringToFloat64(priceStr)
+			price = int64(priceF * 1000000000000000000)
 		} else {
 			if t.ChainId == "97" {
 				err, price = s.GetTestNetTokenPrice(t.Token)

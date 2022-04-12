@@ -66,6 +66,24 @@ func RedisSet(key string, data interface{}, aliveSeconds int) error {
 	return nil
 }
 
+// RedisSetString  设置key、value、time
+func RedisSetString(key string, data string, aliveSeconds int) error {
+	conn := RedisConn.Get()
+	defer func() {
+		_ = conn.Close()
+	}()
+	var err error
+	if aliveSeconds > 0 {
+		_, err = redis.String(conn.Do("set", key, data, "EX", aliveSeconds))
+	} else {
+		_, err = redis.String(conn.Do("set", key, data))
+	}
+	if err != nil {
+		return err
+	}
+	return nil
+}
+
 // RedisGet 获取Key
 func RedisGet(key string) ([]byte, error) {
 	conn := RedisConn.Get()

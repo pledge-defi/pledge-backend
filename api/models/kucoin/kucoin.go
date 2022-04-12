@@ -75,7 +75,7 @@ func GetExchangePrice() {
 			PlgrPriceChain <- t.Price
 			PlgrPrice = t.Price
 			//log.Logger.Sugar().Info("Price ", t.Price)
-			_ = db.RedisSet("plgr_price", PlgrPrice, 0)
+			_ = db.RedisSetString("plgr_price", PlgrPrice, 0)
 		}
 	}
 }
