@@ -36,16 +36,16 @@ func (c *PriceController) NewPrice(ctx *gin.Context) {
 		return
 	}
 
-	ramdomId := ""
+	randomId := ""
 	remoteIP, ok := ctx.RemoteIP()
 	if ok {
-		ramdomId = strings.Replace(remoteIP.String(), ".", "_", -1) + "_" + utils.GetRandomString(23)
+		randomId = strings.Replace(remoteIP.String(), ".", "_", -1) + "_" + utils.GetRandomString(23)
 	} else {
-		ramdomId = utils.GetRandomString(32)
+		randomId = utils.GetRandomString(32)
 	}
 
 	server := &ws.Server{
-		Id:       ramdomId,
+		Id:       randomId,
 		Socket:   conn,
 		Send:     make(chan []byte, 800),
 		LastTime: time.Now().Unix(),
