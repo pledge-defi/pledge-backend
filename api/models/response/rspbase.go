@@ -5,12 +5,10 @@ import (
 	"pledge-backend/api/common/statecode"
 )
 
-// Gin --------------------------------------------------------------------------------------------
 type Gin struct {
 	Res *gin.Context
 }
 
-// Page  --------------------------------------------------------------------------------------------
 type Page struct {
 	Code  int         `json:"code"`
 	Msg   string      `json:"message"`
@@ -18,7 +16,7 @@ type Page struct {
 	Data  interface{} `json:"data"`
 }
 
-// ResponsePages --------------------------------------------------------------------------------------------
+// ResponsePages
 // 响应统一分页格式
 func (g *Gin) ResponsePages(c *gin.Context, code int, totalCount int, data interface{}) {
 	lang := statecode.LangZh
@@ -56,7 +54,6 @@ func (g *Gin) Response(c *gin.Context, code int, data interface{}, httpStatus ..
 	return
 }
 
-// Response --------------------------------------------------------------------------------------------
 type Response struct {
 	Code int         `json:"code"`
 	Msg  string      `json:"message"`
