@@ -69,7 +69,7 @@ func NewPoolBases() *PoolBases {
 func (p *PoolBases) PoolBaseInfo(chainId int, res *[]PoolBaseInfoRes) error {
 	var poolBases []PoolBases
 
-	err := db.Mysql.Table("poolBases").Where("chain_id=?", chainId).Order("pool_id asc").Find(&poolBases).Debug().Error
+	err := db.Mysql.Table("poolbases").Where("chain_id=?", chainId).Order("pool_id asc").Find(&poolBases).Debug().Error
 	if err != nil {
 		return err
 	}
