@@ -23,7 +23,6 @@ type EnvConfig struct {
 	TaskDuration       int64  `toml:"task_duration"`
 	WssTimeoutDuration int64  `toml:"wss_timeout_duration"`
 	TaskExtendDuration int64  `toml:"task_extend_duration"`
-	PlgrAddress        string `toml:"plgr_address"`
 }
 
 type ThresholdConfig struct {
@@ -69,6 +68,7 @@ type MysqlConfig struct {
 type TestNetConfig struct {
 	ChainId              string `toml:"chain_id"`
 	NetUrl               string `toml:"net_url"`
+	PlgrAddress          string `toml:"plgr_address"`
 	PledgePoolToken      string `toml:"pledge_pool_token"`
 	BscPledgeOracleToken string `toml:"bsc_pledge_oracle_token"`
 }
@@ -76,6 +76,7 @@ type TestNetConfig struct {
 type MainNetConfig struct {
 	ChainId              string `toml:"chain_id"`
 	NetUrl               string `toml:"net_url"`
+	PlgrAddress          string `toml:"plgr_address"`
 	PledgePoolToken      string `toml:"pledge_pool_token"`
 	BscPledgeOracleToken string `toml:"bsc_pledge_oracle_token"`
 }

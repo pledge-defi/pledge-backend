@@ -23,12 +23,14 @@ idle_timeout = 0
 [testnet]
 chain_id = "97"
 net_url = "https://data-seed-prebsc-1-s1.binance.org:8545"
+plgr_address = "0X6AA91CBFE045F9D154050226FCC830DDBA886CED"
 pledge_pool_token = "0x216f718A983FCCb462b338FA9c60f2A89199490c"
 bsc_pledge_oracle_token = "0xd96DBDC193617A0cD4bbf38E78a0fB4799A8E554"
 
 [mainnet]
 chain_id = "56"
 net_url = "https://bsc-dataseed2.ninicoin.io"
+plgr_address = "0X6AA91CBFE045F9D154050226FCC830DDBA886CED"
 pledge_pool_token = "0x78CE5055149Dc30755612209f9d9A98f36fb022E"
 bsc_pledge_oracle_token = "0x6cc2B5D12aD1Cc66149F2fb895ca863e9aEbD31e"
 
@@ -51,7 +53,6 @@ task_duration = 2
 task_extend_duration = 5
 wss_timeout_duration = 20
 domain_name = "v2-backend.pledger.finance"
-plgr_address = "0X6AA91CBFE045F9D154050226FCC830DDBA886CED"
 
 [threshold]
 pledge_pool_token_threshold_bnb = "100000000000000000"

@@ -41,7 +41,7 @@ func (s *BalanceMonitor) Monitor() {
 	tokenPoolBalance, err = s.GetBalance(config.Config.MainNet.NetUrl, config.Config.MainNet.PledgePoolToken)
 	thresholdPoolToken, ok = new(big.Int).SetString(config.Config.Threshold.PledgePoolTokenThresholdBnb, 10)
 	if ok && (err == nil) && (tokenPoolBalance.Cmp(thresholdPoolToken) <= 0) {
-		emailBody, err := s.EmailBody(config.Config.TestNet.PledgePoolToken, "BNB", tokenPoolBalance.String(), thresholdPoolToken.String())
+		emailBody, err := s.EmailBody(config.Config.MainNet.PledgePoolToken, "BNB", tokenPoolBalance.String(), thresholdPoolToken.String())
 		if err != nil {
 			log.Logger.Error(err.Error())
 		} else {

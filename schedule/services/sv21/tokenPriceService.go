@@ -33,7 +33,7 @@ func (s *TokenPrice) UpdateContractPrice() {
 		if t.Token == "" {
 			log.Logger.Sugar().Error("UpdateContractPrice token empty ", t.Symbol, t.ChainId)
 			continue
-		} else if strings.ToUpper(t.Token) == config.Config.Env.PlgrAddress { // get PLGR price
+		} else if strings.ToUpper(t.Token) == config.Config.TestNet.PlgrAddress { // get PLGR price
 			priceStr, _ := db.RedisGetString("plgr_price")
 			priceF := utils.StringToFloat64(priceStr)
 			price = int64(priceF * 1000000000000000000)
