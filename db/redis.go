@@ -48,7 +48,9 @@ func InitRedis() *redis.Pool {
 // RedisSet 设置key、value、time
 func RedisSet(key string, data interface{}, aliveSeconds int) error {
 	conn := RedisConn.Get()
-	defer conn.Close()
+	defer func() {
+		_ = conn.Close()
+	}()
 	value, err := json.Marshal(data)
 	if err != nil {
 		return err
@@ -67,7 +69,9 @@ func RedisSet(key string, data interface{}, aliveSeconds int) error {
 // RedisGet 获取Key
 func RedisGet(key string) ([]byte, error) {
 	conn := RedisConn.Get()
-	defer conn.Close()
+	defer func() {
+		_ = conn.Close()
+	}()
 	reply, err := redis.Bytes(conn.Do("get", key))
 	if err != nil {
 		return nil, err
@@ -78,7 +82,9 @@ func RedisGet(key string) ([]byte, error) {
 // RedisGetString 获取Key
 func RedisGetString(key string) (string, error) {
 	conn := RedisConn.Get()
-	defer conn.Close()
+	defer func() {
+		_ = conn.Close()
+	}()
 	reply, err := redis.String(conn.Do("get", key))
 	if err != nil {
 		return "", err
@@ -89,7 +95,9 @@ func RedisGetString(key string) (string, error) {
 // RedisSetInt64  set int64 value by key
 func RedisSetInt64(key string, data int64, time int) error {
 	conn := RedisConn.Get()
-	defer conn.Close()
+	defer func() {
+		_ = conn.Close()
+	}()
 	value, err := json.Marshal(data)
 	if err != nil {
 		return err
@@ -110,7 +118,9 @@ func RedisSetInt64(key string, data int64, time int) error {
 // RedisGetInt64 get int64 value by key
 func RedisGetInt64(key string) (int64, error) {
 	conn := RedisConn.Get()
-	defer conn.Close()
+	defer func() {
+		_ = conn.Close()
+	}()
 	reply, err := redis.Int64(conn.Do("get", key))
 	if err != nil {
 		return -1, err
@@ -121,14 +131,18 @@ func RedisGetInt64(key string) (int64, error) {
 // RedisDelete 删除Key
 func RedisDelete(key string) (bool, error) {
 	conn := RedisConn.Get()
-	defer conn.Close()
+	defer func() {
+		_ = conn.Close()
+	}()
 	return redis.Bool(conn.Do("del", key))
 }
 
 // RedisFlushDB 清空当前DB
 func RedisFlushDB() error {
 	conn := RedisConn.Get()
-	defer conn.Close()
+	defer func() {
+		_ = conn.Close()
+	}()
 	_, err := conn.Do("flushdb")
 	if err != nil {
 		return err
@@ -139,7 +153,9 @@ func RedisFlushDB() error {
 // RedisGetHashOne 获取Heah其中一个值
 func RedisGetHashOne(key, name string) (interface{}, error) {
 	conn := RedisConn.Get()
-	defer conn.Close()
+	defer func() {
+		_ = conn.Close()
+	}()
 	reply, err := conn.Do("hgetall", key, name)
 	if err != nil {
 		return nil, err
@@ -150,7 +166,9 @@ func RedisGetHashOne(key, name string) (interface{}, error) {
 // RedisSetHash 设置Hash
 func RedisSetHash(key string, data map[string]string, time interface{}) error {
 	conn := RedisConn.Get()
-	defer conn.Close()
+	defer func() {
+		_ = conn.Close()
+	}()
 	for k, v := range data {
 		err := conn.Send("hset", key, k, v)
 		if err != nil {
@@ -174,7 +192,9 @@ func RedisSetHash(key string, data map[string]string, time interface{}) error {
 // RedisGetHash 获取Hash类型
 func RedisGetHash(key string) (map[string]string, error) {
 	conn := RedisConn.Get()
-	defer conn.Close()
+	defer func() {
+		_ = conn.Close()
+	}()
 	reply, err := redis.StringMap(conn.Do("hgetall", key))
 	if err != nil {
 		return nil, err
@@ -191,7 +211,9 @@ func RedisDelHash(key string) (bool, error) {
 // RedisExistsHash 检查Key是否存在
 func RedisExistsHash(key string) bool {
 	conn := RedisConn.Get()
-	defer conn.Close()
+	defer func() {
+		_ = conn.Close()
+	}()
 	exists, err := redis.Bool(conn.Do("hexists", key))
 	if err != nil {
 		return false
@@ -202,7 +224,9 @@ func RedisExistsHash(key string) bool {
 // RedisExists 检查Key是否存在
 func RedisExists(key string) bool {
 	conn := RedisConn.Get()
-	defer conn.Close()
+	defer func() {
+		_ = conn.Close()
+	}()
 	exists, err := redis.Bool(conn.Do("exists", key))
 	if err != nil {
 		return false
@@ -213,7 +237,9 @@ func RedisExists(key string) bool {
 // RedisGetTTL 获取Key剩余时间
 func RedisGetTTL(key string) int64 {
 	conn := RedisConn.Get()
-	defer conn.Close()
+	defer func() {
+		_ = conn.Close()
+	}()
 	reply, err := redis.Int64(conn.Do("ttl", key))
 	if err != nil {
 		return 0
@@ -224,7 +250,9 @@ func RedisGetTTL(key string) int64 {
 // RedisSAdd set 集合
 func RedisSAdd(k, v string) int64 {
 	conn := RedisConn.Get()
-	defer conn.Close()
+	defer func() {
+		_ = conn.Close()
+	}()
 	reply, err := conn.Do("SAdd", k, v)
 	if err != nil {
 		return -1
@@ -235,7 +263,9 @@ func RedisSAdd(k, v string) int64 {
 // RedisSmembers 获取集合元素
 func RedisSmembers(k string) ([]string, error) {
 	conn := RedisConn.Get()
-	defer conn.Close()
+	defer func() {
+		_ = conn.Close()
+	}()
 	reply, err := redis.Strings(conn.Do("smembers", k))
 	if err != nil {
 		return []string{}, errors.New("读取set错误")
@@ -252,7 +282,9 @@ type RedisEncryptionTask struct {
 // RedisListRpush 列表右侧添加数据
 func RedisListRpush(listName string, encryption string) error {
 	conn := RedisConn.Get()
-	defer conn.Close()
+	defer func() {
+		_ = conn.Close()
+	}()
 	_, err := conn.Do("rpush", listName, encryption)
 	return err
 }
@@ -260,7 +292,9 @@ func RedisListRpush(listName string, encryption string) error {
 // RedisListLRange 取出列表中所有元素
 func RedisListLRange(listName string) ([]string, error) {
 	conn := RedisConn.Get()
-	defer conn.Close()
+	defer func() {
+		_ = conn.Close()
+	}()
 	res, err := redis.Strings(conn.Do("lrange", listName, 0, -1))
 	return res, err
 }
@@ -268,7 +302,9 @@ func RedisListLRange(listName string) ([]string, error) {
 // RedisListLRem 删除列表中指定元素
 func RedisListLRem(listName string, encryption string) error {
 	conn := RedisConn.Get()
-	defer conn.Close()
+	defer func() {
+		_ = conn.Close()
+	}()
 	_, err := conn.Do("lrem", listName, 1, encryption)
 	return err
 }
@@ -276,7 +312,9 @@ func RedisListLRem(listName string, encryption string) error {
 // RedisListLength 列表长度
 func RedisListLength(listName string) (interface{}, error) {
 	conn := RedisConn.Get()
-	defer conn.Close()
+	defer func() {
+		_ = conn.Close()
+	}()
 	len, err := conn.Do("llen", listName)
 	return len, err
 }
@@ -284,7 +322,9 @@ func RedisListLength(listName string) (interface{}, error) {
 // RedisDelList list 删除整个列表
 func RedisDelList(setName string) error {
 	conn := RedisConn.Get()
-	defer conn.Close()
+	defer func() {
+		_ = conn.Close()
+	}()
 	_, err := conn.Do("del", setName)
 	return err
 }

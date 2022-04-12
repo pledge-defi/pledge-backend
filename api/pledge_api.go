@@ -36,7 +36,7 @@ func main() {
 	app.Static("/storage/", staticPath)
 	app.Use(middlewares.Cors()) // 「 Cross domain Middleware 」
 	routes.InitRoute(app)
-	app.Run(":" + config.Config.Env.Port)
+	_ = app.Run(":" + config.Config.Env.Port)
 
 }
 

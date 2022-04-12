@@ -14,7 +14,7 @@ func NewPool() *poolService {
 
 func (s *poolService) PoolBaseInfo(chainId int, result *[]models.PoolBaseInfoRes) int {
 
-	err := models.NewPoolbases().PoolBaseInfo(chainId, result)
+	err := models.NewPoolBases().PoolBaseInfo(chainId, result)
 	if err != nil {
 		log.Logger.Error(err.Error())
 		return statecode.COMMON_ERR_SERVER_ERR

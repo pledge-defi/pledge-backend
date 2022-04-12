@@ -59,7 +59,7 @@ func (s *Server) ReadAndWrite() {
 
 	defer func() {
 		Manager.Servers.Delete(s)
-		s.Socket.Close()
+		_ = s.Socket.Close()
 		close(s.Send)
 	}()
 

@@ -62,23 +62,23 @@ type PoolBaseInfoRes struct {
 	PoolData PoolBaseInfo `json:"pool_data"`
 }
 
-func NewPoolbases() *Poolbases {
+func NewPoolBases() *Poolbases {
 	return &Poolbases{}
 }
 
 func (p *Poolbases) PoolBaseInfo(chainId int, res *[]PoolBaseInfoRes) error {
-	var poolbases []Poolbases
+	var poolBases []Poolbases
 
-	err := db.Mysql.Table("poolbases").Where("chain_id=?", chainId).Order("pool_id asc").Find(&poolbases).Debug().Error
+	err := db.Mysql.Table("poolBases").Where("chain_id=?", chainId).Order("pool_id asc").Find(&poolBases).Debug().Error
 	if err != nil {
 		return err
 	}
 
-	for _, v := range poolbases {
+	for _, v := range poolBases {
 		borrowTokenInfo := BorrowTokenInfo{}
-		json.Unmarshal([]byte(v.BorrowTokenInfo), &borrowTokenInfo)
+		_ = json.Unmarshal([]byte(v.BorrowTokenInfo), &borrowTokenInfo)
 		lendTokenInfo := LendTokenInfo{}
-		json.Unmarshal([]byte(v.LendTokenInfo), &lendTokenInfo)
+		_ = json.Unmarshal([]byte(v.LendTokenInfo), &lendTokenInfo)
 		*res = append(*res, PoolBaseInfoRes{
 			Index: v.PoolID - 1,
 			PoolData: PoolBaseInfo{

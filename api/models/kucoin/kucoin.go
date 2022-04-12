@@ -64,7 +64,7 @@ func GetExchangePrice() {
 		case err := <-ec:
 			c.Stop() // Stop subscribing the WebSocket feed
 			log.Logger.Sugar().Errorf("Error: %s", err.Error())
-			c.Unsubscribe(uch)
+			_ = c.Unsubscribe(uch)
 			return
 		case msg := <-mc:
 			t := &kucoin.TickerLevel1Model{}
@@ -75,7 +75,7 @@ func GetExchangePrice() {
 			PlgrPriceChain <- t.Price
 			PlgrPrice = t.Price
 			//log.Logger.Sugar().Info("Price ", t.Price)
-			db.RedisSet("plgr_price", PlgrPrice, 0)
+			_ = db.RedisSet("plgr_price", PlgrPrice, 0)
 		}
 	}
 }

@@ -17,9 +17,9 @@ type PriceController struct {
 func (c *PriceController) NewPrice(ctx *gin.Context) {
 
 	defer func() {
-		recover := recover()
-		if recover != nil {
-			log.Logger.Sugar().Error("new price recover ", recover)
+		recoverRes := recover()
+		if recoverRes != nil {
+			log.Logger.Sugar().Error("new price recover ", recoverRes)
 		}
 	}()
 

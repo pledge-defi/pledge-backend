@@ -8,7 +8,7 @@ import (
 	"pledge-backend/db"
 )
 
-// multi-sign signature
+// MultiSign multi-sign signature
 type MultiSign struct {
 	Id               int32  `gorm:"column:id;primaryKey"`
 	SpName           string `json:"sp_name" gorm:"column:sp_name"`

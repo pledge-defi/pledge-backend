@@ -40,7 +40,7 @@ func (c *UserController) Logout(ctx *gin.Context) {
 	usernameIntf, _ := ctx.Get("username")
 
 	//delete username in redis
-	db.RedisDelete(usernameIntf.(string))
+	_, _ = db.RedisDelete(usernameIntf.(string))
 
 	res.Response(ctx, statecode.COMMON_SUCCESS, nil)
 	return

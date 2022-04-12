@@ -26,7 +26,7 @@ func (s *UserService) Login(req *request.Login, result *response.Login) int {
 		}
 		result.TokenId = token
 		//save to redis
-		db.RedisSet(req.Name, "login_ok", config.Config.Jwt.ExpireTime)
+		_ = db.RedisSet(req.Name, "login_ok", config.Config.Jwt.ExpireTime)
 		return statecode.COMMON_SUCCESS
 	} else {
 		return statecode.NAME_OR_PASSWORD_ERR

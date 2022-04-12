@@ -36,12 +36,12 @@ func InitMysql() {
 		log.Logger.Panic(fmt.Sprintf("mysql connention error ==>  %+v", err))
 	}
 
-	db.Callback().Create().After("gorm:after_create").Register("after_create", After)
-	db.Callback().Query().After("gorm:after_query").Register("after_query", After)
-	db.Callback().Delete().After("gorm:after_delete").Register("after_delete", After)
-	db.Callback().Update().After("gorm:after_update").Register("after_update", After)
-	db.Callback().Row().After("gorm:row").Register("after_row", After)
-	db.Callback().Raw().After("gorm:raw").Register("after_raw", After)
+	_ = db.Callback().Create().After("gorm:after_create").Register("after_create", After)
+	_ = db.Callback().Query().After("gorm:after_query").Register("after_query", After)
+	_ = db.Callback().Delete().After("gorm:after_delete").Register("after_delete", After)
+	_ = db.Callback().Update().After("gorm:after_update").Register("after_update", After)
+	_ = db.Callback().Row().After("gorm:row").Register("after_row", After)
+	_ = db.Callback().Raw().After("gorm:raw").Register("after_raw", After)
 
 	//自动迁移为给定模型运行自动迁移，只会添加缺失的字段，不会删除/更改当前数据
 	//db.AutoMigrate(&TestTable{})

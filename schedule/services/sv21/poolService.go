@@ -110,7 +110,7 @@ func (s *poolService) UpdatePoolInfo(contractAddress, network, chainId string) {
 			if err != nil {
 				log.Logger.Sugar().Error("SavePoolBase err ", chainId, poolId)
 			}
-			db.RedisSet("base_info:pool_"+chainId+"_"+poolId, baseInfoMd5Str, 60*30) //The expiration time is set to prevent hsah collision
+			_ = db.RedisSet("base_info:pool_"+chainId+"_"+poolId, baseInfoMd5Str, 60*30) //The expiration time is set to prevent hsah collision
 		}
 
 		dataInfo, err := pledgePoolToken.PledgePoolTokenCaller.PoolDataInfo(nil, big.NewInt(int64(i)))
@@ -135,7 +135,7 @@ func (s *poolService) UpdatePoolInfo(contractAddress, network, chainId string) {
 			if err != nil {
 				log.Logger.Sugar().Error("SavePoolData err ", chainId, poolId)
 			}
-			db.RedisSet("data_info:pool_"+chainId+"_"+poolId, dataInfoMd5Str, 60*30) //The expiration time is set to prevent hsah collision
+			_ = db.RedisSet("data_info:pool_"+chainId+"_"+poolId, dataInfoMd5Str, 60*30) //The expiration time is set to prevent hsah collision
 		}
 	}
 }

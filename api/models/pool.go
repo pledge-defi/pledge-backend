@@ -50,9 +50,9 @@ func (p *Pool) Pagination(req *request.Search, whereCondition string) (error, in
 			return err, 0, nil
 		}
 		var lendToken models.LendToken
-		json.Unmarshal([]byte(b.LendTokenInfo), &lendToken)
+		_ = json.Unmarshal([]byte(b.LendTokenInfo), &lendToken)
 		var borrowToken models.BorrowToken
-		json.Unmarshal([]byte(b.BorrowTokenInfo), &borrowToken)
+		_ = json.Unmarshal([]byte(b.BorrowTokenInfo), &borrowToken)
 		pools = append(pools, Pool{
 			PoolID:                 b.PoolId,
 			SettleTime:             b.SettleTime,
