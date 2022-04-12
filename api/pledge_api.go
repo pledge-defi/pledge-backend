@@ -1,7 +1,6 @@
 package main
 
 import (
-	"fmt"
 	"github.com/gin-gonic/gin"
 	"pledge-backend/api/middlewares"
 	"pledge-backend/api/models/kucoin"
@@ -11,13 +10,10 @@ import (
 	"pledge-backend/api/validate"
 	"pledge-backend/config"
 	"pledge-backend/db"
-	"strings"
 )
 
 func main() {
 
-	fmt.Println(strings.ToUpper("0x6Aa91CbfE045f9D154050226fCc830ddbA886CED"))
-	fmt.Println(strings.ToUpper(config.Config.Env.PlgrAddress))
 	//init mysql
 	db.InitMysql()
 
