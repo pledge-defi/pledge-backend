@@ -7,7 +7,7 @@ import (
 	"github.com/ethereum/go-ethereum/ethclient"
 	"gorm.io/gorm"
 	"pledge-backend/config"
-	tokengo "pledge-backend/contract/bindings/tokenv22"
+	tokengo "pledge-backend/contract/bindings/tokenv21"
 	"pledge-backend/db"
 	"pledge-backend/log"
 	"pledge-backend/schedule/models"
