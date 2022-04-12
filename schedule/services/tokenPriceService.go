@@ -40,7 +40,7 @@ func (s *TokenPrice) UpdateContractPrice() {
 				if strings.ToUpper(t.Token) == config.Config.MainNet.PlgrAddress { // get PLGR price from ku-coin(Only main network price)
 					priceStr, _ := db.RedisGetString("plgr_price")
 					priceF := utils.StringToFloat64(priceStr)
-					price = int64(priceF * 1000000000000000000)
+					price = int64(priceF * 100000000)
 				} else {
 					err, price = s.GetMainNetTokenPrice(t.Token)
 				}
