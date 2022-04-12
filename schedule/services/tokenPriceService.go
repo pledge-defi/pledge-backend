@@ -5,6 +5,7 @@ import (
 	"errors"
 	"github.com/ethereum/go-ethereum/common"
 	"github.com/ethereum/go-ethereum/ethclient"
+	"github.com/shopspring/decimal"
 	"gorm.io/gorm"
 	"pledge-backend/config"
 	"pledge-backend/contract/bindings"
@@ -39,8 +40,8 @@ func (s *TokenPrice) UpdateContractPrice() {
 			} else if t.ChainId == "56" {
 				if strings.ToUpper(t.Token) == config.Config.MainNet.PlgrAddress { // get PLGR price from ku-coin(Only main network price)
 					priceStr, _ := db.RedisGetString("plgr_price")
-					priceF := utils.StringToFloat64(priceStr)
-					price = int64(priceF * 100000000)
+					priceF, _ := decimal.NewFromString(priceStr)
+					price = priceF.IntPart()
 				} else {
 					err, price = s.GetMainNetTokenPrice(t.Token)
 				}
