@@ -27,7 +27,7 @@ func (s *TokenPrice) UpdateContractPrice() {
 	db.Mysql.Table("token_info").Find(&tokens)
 	for _, t := range tokens {
 
-		err := errors.New("")
+		var err error
 		var price int64 = 0
 
 		if t.Token == "" {
@@ -44,10 +44,8 @@ func (s *TokenPrice) UpdateContractPrice() {
 				} else {
 					err, price = s.GetMainNetTokenPrice(t.Token)
 				}
-			} else {
-				log.Logger.Sugar().Error("UpdateContractPrice chain_id err ", t.Symbol, t.ChainId)
-				continue
 			}
+
 			if err != nil {
 				log.Logger.Sugar().Error("UpdateContractPrice err ", t.Symbol, t.ChainId, err)
 				continue
