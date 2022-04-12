@@ -24,7 +24,7 @@ type PoolBaseInfo struct {
 	State                  string          `json:"state"`
 }
 
-type Poolbases struct {
+type PoolBases struct {
 	PoolID                 int    `json:"pool_id"`
 	AutoLiquidateThreshold string `json:"autoLiquidateThreshold"`
 	BorrowSupply           string `json:"borrowSupply"`
@@ -62,12 +62,12 @@ type PoolBaseInfoRes struct {
 	PoolData PoolBaseInfo `json:"pool_data"`
 }
 
-func NewPoolBases() *Poolbases {
-	return &Poolbases{}
+func NewPoolBases() *PoolBases {
+	return &PoolBases{}
 }
 
-func (p *Poolbases) PoolBaseInfo(chainId int, res *[]PoolBaseInfoRes) error {
-	var poolBases []Poolbases
+func (p *PoolBases) PoolBaseInfo(chainId int, res *[]PoolBaseInfoRes) error {
+	var poolBases []PoolBases
 
 	err := db.Mysql.Table("poolBases").Where("chain_id=?", chainId).Order("pool_id asc").Find(&poolBases).Debug().Error
 	if err != nil {
