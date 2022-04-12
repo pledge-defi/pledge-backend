@@ -12,6 +12,7 @@ import (
 )
 
 const SuccessCode = 0
+const PongCode = 1
 const ErrorCode = -1
 
 type Server struct {
@@ -89,7 +90,7 @@ func (s *Server) ReadAndWrite() {
 			//update ping time
 			if string(message) == "ping" || string(message) == `"ping"` || string(message) == "'ping'" {
 				s.LastTime = time.Now().Unix()
-				s.SendToClient("pong", SuccessCode)
+				s.SendToClient("pong", PongCode)
 			}
 			continue
 		}

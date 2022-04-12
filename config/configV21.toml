@@ -51,6 +51,7 @@ task_duration = 2
 task_extend_duration = 5
 wss_timeout_duration = 20
 domain_name = "dev-v2-backend.pledger.finance"
+plgr_address = "0x6aa91cbfe045f9d154050226fcc830ddba886ced"
 
 [threshold]
 pledge_pool_token_threshold_bnb = "100000000000000000"

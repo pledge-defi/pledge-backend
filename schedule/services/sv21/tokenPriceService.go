@@ -25,23 +25,29 @@ func (s *TokenPrice) UpdateContractPrice() {
 	var tokens []models.TokenInfo
 	db.Mysql.Table("token_info").Find(&tokens)
 	for _, t := range tokens {
+
+		err := errors.New("")
+		var price int64 = 0
+
 		if t.Token == "" {
 			log.Logger.Sugar().Error("UpdateContractPrice token empty ", t.Symbol, t.ChainId)
 			continue
-		}
-		err := errors.New("")
-		var price int64 = 0
-		if t.ChainId == "97" {
-			err, price = s.GetTestNetTokenPrice(t.Token)
-		} else if t.ChainId == "56" {
-			err, price = s.GetMainNetTokenPrice(t.Token)
+		} else if t.Token == config.Config.Env.PlgrAddress { // get PLGR price
+			priceStr, _ := db.RedisGetString("plgr_price")
+			price = utils.StringToInt64(priceStr)
 		} else {
-			log.Logger.Sugar().Error("UpdateContractPrice chain_id err ", t.Symbol, t.ChainId)
-			continue
-		}
-		if err != nil {
-			log.Logger.Sugar().Error("UpdateContractPrice err ", t.Symbol, t.ChainId, err)
-			continue
+			if t.ChainId == "97" {
+				err, price = s.GetTestNetTokenPrice(t.Token)
+			} else if t.ChainId == "56" {
+				err, price = s.GetMainNetTokenPrice(t.Token)
+			} else {
+				log.Logger.Sugar().Error("UpdateContractPrice chain_id err ", t.Symbol, t.ChainId)
+				continue
+			}
+			if err != nil {
+				log.Logger.Sugar().Error("UpdateContractPrice err ", t.Symbol, t.ChainId, err)
+				continue
+			}
 		}
 
 		hasNewData, err := s.CheckPriceData(t.Token, t.ChainId, utils.Int64ToString(price))

@@ -23,6 +23,7 @@ type EnvConfig struct {
 	TaskDuration       int64  `toml:"task_duration"`
 	WssTimeoutDuration int64  `toml:"wss_timeout_duration"`
 	TaskExtendDuration int64  `toml:"task_extend_duration"`
+	PlgrAddress        string `toml:"plgr_address"`
 }
 
 type ThresholdConfig struct {
