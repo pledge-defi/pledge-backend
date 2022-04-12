@@ -26,7 +26,7 @@ func (c *SearchService) Search(req *request.Search) (int, int64, []models.Pool) 
 	err, total, data := models.NewPool().Pagination(req, whereCondition)
 	if err != nil {
 		log.Logger.Error(err.Error())
-		return statecode.COMMON_ERR_SERVER_ERR, 0, nil
+		return statecode.CommonErrServerErr, 0, nil
 	}
 	return 0, total, data
 }

@@ -17,9 +17,9 @@ func (s *poolService) PoolBaseInfo(chainId int, result *[]models.PoolBaseInfoRes
 	err := models.NewPoolBases().PoolBaseInfo(chainId, result)
 	if err != nil {
 		log.Logger.Error(err.Error())
-		return statecode.COMMON_ERR_SERVER_ERR
+		return statecode.CommonErrServerErr
 	}
-	return statecode.COMMON_SUCCESS
+	return statecode.CommonSuccess
 }
 
 func (s *poolService) PoolDataInfo(chainId int, result *[]models.PoolDataInfoRes) int {
@@ -27,7 +27,7 @@ func (s *poolService) PoolDataInfo(chainId int, result *[]models.PoolDataInfoRes
 	err := models.NewPoolData().PoolDataInfo(chainId, result)
 	if err != nil {
 		log.Logger.Error(err.Error())
-		return statecode.COMMON_ERR_SERVER_ERR
+		return statecode.CommonErrServerErr
 	}
-	return statecode.COMMON_SUCCESS
+	return statecode.CommonSuccess
 }

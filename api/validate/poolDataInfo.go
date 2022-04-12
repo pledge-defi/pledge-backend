@@ -17,20 +17,20 @@ func NewPoolDataInfo() *PoolDataInfo {
 func (v *PoolDataInfo) PoolDataInfo(c *gin.Context, req *request.PoolDataInfo) int {
 	err := c.ShouldBind(req)
 	if err == io.EOF {
-		return statecode.PARAMETER_EMPTY_ERR
+		return statecode.ParameterEmptyErr
 	} else if err != nil {
 		errs := err.(validator.ValidationErrors)
 		for _, e := range errs {
 			if e.Field() == "ChainId" && e.Tag() == "required" {
-				return statecode.CHAINID_EMPTY
+				return statecode.ChainIdEmpty
 			}
 		}
-		return statecode.COMMON_ERR_SERVER_ERR
+		return statecode.CommonErrServerErr
 	}
 
 	if req.ChainId != 97 && req.ChainId != 56 {
-		return statecode.CHAINID_ERR
+		return statecode.ChainIdErr
 	}
 
-	return statecode.COMMON_SUCCESS
+	return statecode.CommonSuccess
 }

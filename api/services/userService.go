@@ -22,13 +22,13 @@ func (s *UserService) Login(req *request.Login, result *response.Login) int {
 		token, err := utils.CreateToken(req.Name)
 		if err != nil {
 			log.Logger.Error("CreateToken" + err.Error())
-			return statecode.COMMON_ERR_SERVER_ERR
+			return statecode.CommonErrServerErr
 		}
 		result.TokenId = token
 		//save to redis
 		_ = db.RedisSet(req.Name, "login_ok", config.Config.Jwt.ExpireTime)
-		return statecode.COMMON_SUCCESS
+		return statecode.CommonSuccess
 	} else {
-		return statecode.NAME_OR_PASSWORD_ERR
+		return statecode.NameOrPasswordErr
 	}
 }

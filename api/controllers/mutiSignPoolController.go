@@ -19,19 +19,19 @@ func (c *MutiSignPoolController) SetMultiSign(ctx *gin.Context) {
 	log.Logger.Sugar().Info("SetMultiSign req ", req)
 
 	errCode := validate.NewMutiSign().SetMultiSign(ctx, &req)
-	if errCode != statecode.COMMON_SUCCESS {
+	if errCode != statecode.CommonSuccess {
 		res.Response(ctx, errCode, nil)
 		return
 	}
 
 	errCode, err := services.NewMutiSign().SetMultiSign(&req)
-	if errCode != statecode.COMMON_SUCCESS {
+	if errCode != statecode.CommonSuccess {
 		log.Logger.Error(err.Error())
 		res.Response(ctx, errCode, nil)
 		return
 	}
 
-	res.Response(ctx, statecode.COMMON_SUCCESS, nil)
+	res.Response(ctx, statecode.CommonSuccess, nil)
 	return
 }
 
@@ -42,18 +42,18 @@ func (c *MutiSignPoolController) GetMultiSign(ctx *gin.Context) {
 	log.Logger.Sugar().Info("GetMultiSign req ", nil)
 
 	errCode := validate.NewMutiSign().GetMultiSign(ctx, &req)
-	if errCode != statecode.COMMON_SUCCESS {
+	if errCode != statecode.CommonSuccess {
 		res.Response(ctx, errCode, nil)
 		return
 	}
 
 	errCode, err := services.NewMutiSign().GetMultiSign(&result, req.ChainId)
-	if errCode != statecode.COMMON_SUCCESS {
+	if errCode != statecode.CommonSuccess {
 		log.Logger.Error(err.Error())
 		res.Response(ctx, errCode, nil)
 		return
 	}
 
-	res.Response(ctx, statecode.COMMON_SUCCESS, result)
+	res.Response(ctx, statecode.CommonSuccess, result)
 	return
 }

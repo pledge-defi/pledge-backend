@@ -21,7 +21,7 @@ type Page struct {
 // ResponsePages --------------------------------------------------------------------------------------------
 // 响应统一分页格式
 func (g *Gin) ResponsePages(c *gin.Context, code int, totalCount int, data interface{}) {
-	lang := statecode.LANG_ZH
+	lang := statecode.LangZh
 	langInf, hasLang := c.Get("lang")
 	if hasLang {
 		lang = langInf.(int)
@@ -38,7 +38,7 @@ func (g *Gin) ResponsePages(c *gin.Context, code int, totalCount int, data inter
 
 // Response  响应统一格式
 func (g *Gin) Response(c *gin.Context, code int, data interface{}, httpStatus ...int) {
-	lang := statecode.LANG_EN
+	lang := statecode.LangEn
 	langInf, hasLang := c.Get("lang")
 	if hasLang {
 		lang = langInf.(int)

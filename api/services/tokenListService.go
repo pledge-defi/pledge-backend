@@ -15,17 +15,17 @@ func NewTokenList() *TokenList {
 func (c *TokenList) DebtTokenList(req *request.TokenList) (int, []models.TokenInfo) {
 	err, res := models.NewTokenInfo().GetTokenInfo(req)
 	if err != nil {
-		return statecode.COMMON_ERR_SERVER_ERR, nil
+		return statecode.CommonErrServerErr, nil
 	}
-	return statecode.COMMON_SUCCESS, res
+	return statecode.CommonSuccess, res
 
 }
 
 func (c *TokenList) GetTokenList(req *request.TokenList) (int, []models.TokenList) {
 	err, tokenList := models.NewTokenInfo().GetTokenList(req)
 	if err != nil {
-		return statecode.COMMON_ERR_SERVER_ERR, nil
+		return statecode.CommonErrServerErr, nil
 	}
-	return statecode.COMMON_SUCCESS, tokenList
+	return statecode.CommonSuccess, tokenList
 
 }

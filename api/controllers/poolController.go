@@ -23,18 +23,18 @@ func (c *PoolController) PoolBaseInfo(ctx *gin.Context) {
 	var result []models.PoolBaseInfoRes
 
 	errCode := validate.NewPoolBaseInfo().PoolBaseInfo(ctx, &req)
-	if errCode != statecode.COMMON_SUCCESS {
+	if errCode != statecode.CommonSuccess {
 		res.Response(ctx, errCode, nil)
 		return
 	}
 
 	errCode = services.NewPool().PoolBaseInfo(req.ChainId, &result)
-	if errCode != statecode.COMMON_SUCCESS {
+	if errCode != statecode.CommonSuccess {
 		res.Response(ctx, errCode, nil)
 		return
 	}
 
-	res.Response(ctx, statecode.COMMON_SUCCESS, result)
+	res.Response(ctx, statecode.CommonSuccess, result)
 	return
 }
 
@@ -44,18 +44,18 @@ func (c *PoolController) PoolDataInfo(ctx *gin.Context) {
 	var result []models.PoolDataInfoRes
 
 	errCode := validate.NewPoolDataInfo().PoolDataInfo(ctx, &req)
-	if errCode != statecode.COMMON_SUCCESS {
+	if errCode != statecode.CommonSuccess {
 		res.Response(ctx, errCode, nil)
 		return
 	}
 
 	errCode = services.NewPool().PoolDataInfo(req.ChainId, &result)
-	if errCode != statecode.COMMON_SUCCESS {
+	if errCode != statecode.CommonSuccess {
 		res.Response(ctx, errCode, nil)
 		return
 	}
 
-	res.Response(ctx, statecode.COMMON_SUCCESS, result)
+	res.Response(ctx, statecode.CommonSuccess, result)
 	return
 }
 
@@ -65,7 +65,7 @@ func (c *PoolController) TokenList(ctx *gin.Context) {
 	result := response.TokenList{}
 
 	errCode := validate.NewTokenList().TokenList(ctx, &req)
-	if errCode != statecode.COMMON_SUCCESS {
+	if errCode != statecode.CommonSuccess {
 		ctx.JSON(200, map[string]string{
 			"error": "chainId error",
 		})
@@ -73,7 +73,7 @@ func (c *PoolController) TokenList(ctx *gin.Context) {
 	}
 
 	errCode, data := services.NewTokenList().GetTokenList(&req)
-	if errCode != statecode.COMMON_SUCCESS {
+	if errCode != statecode.CommonSuccess {
 		ctx.JSON(200, map[string]string{
 			"error": "chainId error",
 		})
@@ -110,20 +110,20 @@ func (c *PoolController) Search(ctx *gin.Context) {
 	result := response.Search{}
 
 	errCode := validate.NewSearch().Search(ctx, &req)
-	if errCode != statecode.COMMON_SUCCESS {
+	if errCode != statecode.CommonSuccess {
 		res.Response(ctx, errCode, nil)
 		return
 	}
 
 	errCode, count, pools := services.NewSearch().Search(&req)
-	if errCode != statecode.COMMON_SUCCESS {
+	if errCode != statecode.CommonSuccess {
 		res.Response(ctx, errCode, nil)
 		return
 	}
 
 	result.Rows = pools
 	result.Count = count
-	res.Response(ctx, statecode.COMMON_SUCCESS, result)
+	res.Response(ctx, statecode.CommonSuccess, result)
 	return
 }
 
@@ -132,18 +132,18 @@ func (c *PoolController) DebtTokenList(ctx *gin.Context) {
 	req := request.TokenList{}
 
 	errCode := validate.NewTokenList().TokenList(ctx, &req)
-	if errCode != statecode.COMMON_SUCCESS {
+	if errCode != statecode.CommonSuccess {
 		res.Response(ctx, errCode, nil)
 		return
 	}
 
 	errCode, result := services.NewTokenList().DebtTokenList(&req)
-	if errCode != statecode.COMMON_SUCCESS {
+	if errCode != statecode.CommonSuccess {
 		res.Response(ctx, errCode, nil)
 		return
 	}
 
-	res.Response(ctx, statecode.COMMON_SUCCESS, result)
+	res.Response(ctx, statecode.CommonSuccess, result)
 	return
 }
 

@@ -16,13 +16,13 @@ func CheckToken() gin.HandlerFunc {
 
 		username, err := utils.ParseToken(token, config.Config.Jwt.SecretKey)
 		if err != nil {
-			res.Response(c, statecode.TOKEN_ERR, nil)
+			res.Response(c, statecode.TokenErr, nil)
 			c.Abort()
 			return
 		}
 
 		if username != config.Config.DefaultAdmin.Username {
-			res.Response(c, statecode.TOKEN_ERR, nil)
+			res.Response(c, statecode.TokenErr, nil)
 			c.Abort()
 			return
 		}
@@ -30,7 +30,7 @@ func CheckToken() gin.HandlerFunc {
 		// Judge whether the user logout
 		resByteArr, err := db.RedisGet(username)
 		if string(resByteArr) != `"login_ok"` {
-			res.Response(c, statecode.TOKEN_ERR, nil)
+			res.Response(c, statecode.TokenErr, nil)
 			c.Abort()
 			return
 		}

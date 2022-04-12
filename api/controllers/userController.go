@@ -19,18 +19,18 @@ func (c *UserController) Login(ctx *gin.Context) {
 	result := response.Login{}
 
 	errCode := validate.NewUser().Login(ctx, &req)
-	if errCode != statecode.COMMON_SUCCESS {
+	if errCode != statecode.CommonSuccess {
 		res.Response(ctx, errCode, nil)
 		return
 	}
 
 	errCode = services.NewUser().Login(&req, &result)
-	if errCode != statecode.COMMON_SUCCESS {
+	if errCode != statecode.CommonSuccess {
 		res.Response(ctx, errCode, nil)
 		return
 	}
 
-	res.Response(ctx, statecode.COMMON_SUCCESS, result)
+	res.Response(ctx, statecode.CommonSuccess, result)
 	return
 }
 
@@ -42,6 +42,6 @@ func (c *UserController) Logout(ctx *gin.Context) {
 	//delete username in redis
 	_, _ = db.RedisDelete(usernameIntf.(string))
 
-	res.Response(ctx, statecode.COMMON_SUCCESS, nil)
+	res.Response(ctx, statecode.CommonSuccess, nil)
 	return
 }

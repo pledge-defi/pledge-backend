@@ -19,9 +19,9 @@ func (c *MutiSignService) SetMultiSign(mutiSign *request.SetMultiSign) (int, err
 	//db set
 	err := models.NewMultiSign().Set(mutiSign)
 	if err != nil {
-		return statecode.COMMON_ERR_SERVER_ERR, err
+		return statecode.CommonErrServerErr, err
 	}
-	return statecode.COMMON_SUCCESS, nil
+	return statecode.CommonSuccess, nil
 }
 
 // GetMultiSign Get Multi-Sign
@@ -30,7 +30,7 @@ func (c *MutiSignService) GetMultiSign(mutiSign *response.MultiSign, chainId int
 	multiSignModel := models.NewMultiSign()
 	err := multiSignModel.Get(chainId)
 	if err != nil {
-		return statecode.COMMON_ERR_SERVER_ERR, err
+		return statecode.CommonErrServerErr, err
 	}
 	var multiSignAccount []string
 	_ = json.Unmarshal([]byte(multiSignModel.MultiSignAccount), &multiSignAccount)
@@ -44,5 +44,5 @@ func (c *MutiSignService) GetMultiSign(mutiSign *response.MultiSign, chainId int
 	mutiSign.SpHash = multiSignModel.SpHash
 	mutiSign.JpHash = multiSignModel.JpHash
 	mutiSign.MultiSignAccount = multiSignAccount
-	return statecode.COMMON_SUCCESS, nil
+	return statecode.CommonSuccess, nil
 }
