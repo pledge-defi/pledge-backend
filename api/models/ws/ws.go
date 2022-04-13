@@ -81,27 +81,30 @@ func (s *Server) ReadAndWrite() {
 	//read
 	go func() {
 		for {
+
 			_, message, err := s.Socket.ReadMessage()
 			if err != nil {
 				log.Logger.Sugar().Error(s.Id+" ReadMessage err ", err)
 				errChan <- err
 				return
 			}
-			//update ping time
+
+			//update heartbeat time
 			if string(message) == "ping" || string(message) == `"ping"` || string(message) == "'ping'" {
 				s.LastTime = time.Now().Unix()
 				s.SendToClient("pong", PongCode)
 			}
 			continue
+
 		}
 	}()
 
-	//check ping pong
+	//check heartbeat
 	for {
 		select {
 		case <-time.After(time.Second):
 			if time.Now().Unix()-s.LastTime >= UserPingPongDurTime {
-				s.SendToClient("ping timeout", ErrorCode)
+				s.SendToClient("heartbeat timeout", ErrorCode)
 				return
 			}
 		case err := <-errChan:
@@ -115,7 +118,7 @@ func StartServer() {
 	log.Logger.Info("WsServer start")
 	for {
 		select {
-		case price, ok := <-kucoin.PlgrPriceChain:
+		case price, ok := <-kucoin.PlgrPriceChan:
 			if ok {
 				Manager.Servers.Range(func(key, value interface{}) bool {
 					value.(*Server).SendToClient(price, SuccessCode)

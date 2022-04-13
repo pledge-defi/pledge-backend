@@ -10,7 +10,7 @@ import (
 const ApiKeyVersionV2 = "2"
 
 var PlgrPrice = "0.0027"
-var PlgrPriceChain = make(chan string, 2)
+var PlgrPriceChan = make(chan string, 2)
 
 func GetExchangePrice() {
 
@@ -72,7 +72,7 @@ func GetExchangePrice() {
 				log.Logger.Sugar().Errorf("Failure to read: %s", err.Error())
 				return
 			}
-			PlgrPriceChain <- t.Price
+			PlgrPriceChan <- t.Price
 			PlgrPrice = t.Price
 			//log.Logger.Sugar().Info("Price ", t.Price)
 			_ = db.RedisSetString("plgr_price", PlgrPrice, 0)
