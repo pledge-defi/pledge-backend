@@ -47,7 +47,7 @@ func GetExchangePrice() {
 
 	mc, ec, err := c.Connect()
 	if err != nil {
-		// Handle error
+		log.Logger.Sugar().Errorf("Error: %s", err.Error())
 		return
 	}
 
