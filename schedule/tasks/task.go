@@ -15,6 +15,16 @@ func Task() {
 		panic("clear redis error " + err.Error())
 	}
 
+	//init task
+
+	services.NewPool().UpdateAllPoolInfo()
+	services.NewTokenPrice().UpdateContractPrice()
+	services.NewTokenSymbol().UpdateContractSymbol()
+	services.NewTokenLogo().UpdateTokenLogo()
+	services.NewBalanceMonitor().Monitor()
+	//services.NewTokenPrice().SavePlgrPrice()
+	services.NewTokenPrice().SavePlgrPriceTestNet()
+
 	//run pool task
 	s := gocron.NewScheduler()
 	s.ChangeLoc(time.UTC)
