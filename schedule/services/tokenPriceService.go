@@ -4,6 +4,7 @@ import (
 	"context"
 	"encoding/json"
 	"errors"
+	"fmt"
 	"github.com/ethereum/go-ethereum/accounts/abi/bind"
 	"github.com/ethereum/go-ethereum/common"
 	"github.com/ethereum/go-ethereum/crypto"
@@ -210,6 +211,7 @@ func (s *TokenPrice) SavePlgrPrice() {
 	priceF = priceF.Mul(e8)
 	price := priceF.IntPart()
 
+	price = 22222
 	ethereumConn, err := ethclient.Dial(config.Config.MainNet.NetUrl)
 	if nil != err {
 		log.Logger.Error(err.Error())
@@ -252,4 +254,8 @@ func (s *TokenPrice) SavePlgrPrice() {
 	_, err = bscPledgeOracleMainNetToken.SetPrice(&transactOpts, common.HexToAddress(config.Config.MainNet.PlgrAddress), big.NewInt(price))
 
 	log.Logger.Sugar().Info("SavePlgrPrice ", err)
+
+	a, d := s.GetMainNetTokenPrice(config.Config.MainNet.PlgrAddress)
+	fmt.Println(a, d, 5555)
+	return
 }
