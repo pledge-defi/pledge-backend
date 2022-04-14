@@ -2,6 +2,7 @@ package common
 
 import (
 	"os"
+	"os/exec"
 	"pledge-backend/log"
 )
 
@@ -11,6 +12,8 @@ var PlgrAdminPrivateKeyMainNet string
 func GetEnv() {
 
 	var ok bool
+
+	exec.Command("source /etc/profile")
 
 	PlgrAdminPrivateKeyTestNet, ok = os.LookupEnv("PLGR_PRIVATE_KEY")
 	if !ok {
