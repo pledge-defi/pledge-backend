@@ -15,7 +15,7 @@ func main() {
 	db.InitRedis()
 
 	// get environment variables
-	common.Getenv()
+	common.GetEnv()
 
 	// pool task
 	tasks.Task()

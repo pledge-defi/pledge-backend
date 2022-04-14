@@ -3,21 +3,23 @@ package common
 import (
 	"os"
 	"pledge-backend/log"
-	"strings"
 )
 
 var PlgrAdminPrivateKeyTestNet string
 var PlgrAdminPrivateKeyMainNet string
 
-func Getenv() {
+func GetEnv() {
 
-	PlgrAdminPrivateKeyTestNet = os.Getenv("plgr_admin_private_key_test_net")
-	PlgrAdminPrivateKeyTestNet = strings.Replace(PlgrAdminPrivateKeyTestNet, " ", "", -1)
+	var ok bool
 
-	PlgrAdminPrivateKeyMainNet = os.Getenv("plgr_admin_private_key_main_net")
-	PlgrAdminPrivateKeyMainNet = strings.Replace(PlgrAdminPrivateKeyMainNet, " ", "", -1)
+	PlgrAdminPrivateKeyTestNet, ok = os.LookupEnv("plgr_admin_private_key_test_net")
+	if !ok {
+		log.Logger.Error("environment variable is not set")
+		panic("environment variable is not set")
+	}
 
-	if PlgrAdminPrivateKeyTestNet == "" || PlgrAdminPrivateKeyMainNet == "" {
+	PlgrAdminPrivateKeyMainNet, ok = os.LookupEnv("plgr_admin_private_key_main_net")
+	if !ok {
 		log.Logger.Error("environment variable is not set")
 		panic("environment variable is not set")
 	}
