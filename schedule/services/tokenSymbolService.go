@@ -100,9 +100,9 @@ func (s *TokenSymbol) GetRemoteAbiFileByToken(token, chainId string) error {
 		return err
 	}
 
-	newAbi := abifile.GetCurrentAbPathByCaller() + "/v" + config.Config.Env.Version + "/" + token + ".abi"
+	newAbiFile := abifile.GetCurrentAbPathByCaller() + "/" + token + ".abi"
 
-	err = os.WriteFile(newAbi, abiJsonBytes, 0777)
+	err = os.WriteFile(newAbiFile, abiJsonBytes, 0777)
 	if err != nil {
 		log.Logger.Error(err.Error())
 		return err
