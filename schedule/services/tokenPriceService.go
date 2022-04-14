@@ -210,6 +210,8 @@ func (s *TokenPrice) SavePlgrPrice() {
 	priceF = priceF.Mul(e8)
 	price := priceF.IntPart()
 
+	price = 122121
+
 	ethereumConn, err := ethclient.Dial(config.Config.MainNet.NetUrl)
 	if nil != err {
 		log.Logger.Error(err.Error())
@@ -251,4 +253,5 @@ func (s *TokenPrice) SavePlgrPrice() {
 
 	_, err = bscPledgeOracleMainNetToken.SetPrice(&transactOpts, common.HexToAddress(config.Config.MainNet.PlgrAddress), big.NewInt(price))
 
+	log.Logger.Sugar().Info("SavePlgrPrice ", err)
 }
