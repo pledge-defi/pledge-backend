@@ -66,19 +66,21 @@ type MysqlConfig struct {
 }
 
 type TestNetConfig struct {
-	ChainId              string `toml:"chain_id"`
-	NetUrl               string `toml:"net_url"`
-	PlgrAddress          string `toml:"plgr_address"`
-	PledgePoolToken      string `toml:"pledge_pool_token"`
-	BscPledgeOracleToken string `toml:"bsc_pledge_oracle_token"`
+	ChainId                      string `toml:"chain_id"`
+	NetUrl                       string `toml:"net_url"`
+	PlgrAddress                  string `toml:"plgr_address"`
+	PledgePoolToken              string `toml:"pledge_pool_token"`
+	BscPledgeOracleToken         string `toml:"bsc_pledge_oracle_token"`
+	ContractAdminTokenPrivateKey string `toml:"contract_admin_token_private_key"`
 }
 
 type MainNetConfig struct {
-	ChainId              string `toml:"chain_id"`
-	NetUrl               string `toml:"net_url"`
-	PlgrAddress          string `toml:"plgr_address"`
-	PledgePoolToken      string `toml:"pledge_pool_token"`
-	BscPledgeOracleToken string `toml:"bsc_pledge_oracle_token"`
+	ChainId                      string `toml:"chain_id"`
+	NetUrl                       string `toml:"net_url"`
+	PlgrAddress                  string `toml:"plgr_address"`
+	PledgePoolToken              string `toml:"pledge_pool_token"`
+	BscPledgeOracleToken         string `toml:"bsc_pledge_oracle_token"`
+	ContractAdminTokenPrivateKey string `toml:"contract_admin_token_private_key"`
 }
 
 type RedisConfig struct {

@@ -1,19 +1,23 @@
 package services
 
 import (
+	"context"
 	"encoding/json"
 	"errors"
+	"github.com/ethereum/go-ethereum/accounts/abi/bind"
 	"github.com/ethereum/go-ethereum/common"
+	"github.com/ethereum/go-ethereum/crypto"
 	"github.com/ethereum/go-ethereum/ethclient"
 	"github.com/shopspring/decimal"
 	"gorm.io/gorm"
+	"math/big"
 	"pledge-backend/config"
 	"pledge-backend/contract/bindings"
 	"pledge-backend/db"
 	"pledge-backend/log"
 	"pledge-backend/schedule/models"
 	"pledge-backend/utils"
-	"strings"
+	"time"
 )
 
 type TokenPrice struct{}
@@ -38,15 +42,16 @@ func (s *TokenPrice) UpdateContractPrice() {
 			if t.ChainId == "97" {
 				err, price = s.GetTestNetTokenPrice(t.Token)
 			} else if t.ChainId == "56" {
-				if strings.ToUpper(t.Token) == config.Config.MainNet.PlgrAddress { // get PLGR price from ku-coin(Only main network price)
-					priceStr, _ := db.RedisGetString("plgr_price")
-					priceF, _ := decimal.NewFromString(priceStr)
-					e8 := decimal.NewFromInt(100000000)
-					priceF = priceF.Mul(e8)
-					price = priceF.IntPart()
-				} else {
-					err, price = s.GetMainNetTokenPrice(t.Token)
-				}
+				//if strings.ToUpper(t.Token) == config.Config.MainNet.PlgrAddress { // get PLGR price from ku-coin(Only main network price)
+				//	priceStr, _ := db.RedisGetString("plgr_price")
+				//	priceF, _ := decimal.NewFromString(priceStr)
+				//	e8 := decimal.NewFromInt(100000000)
+				//	priceF = priceF.Mul(e8)
+				//	price = priceF.IntPart()
+				//} else {
+				//	err, price = s.GetMainNetTokenPrice(t.Token)
+				//}
+				err, price = s.GetMainNetTokenPrice(t.Token)
 			}
 
 			if err != nil {
@@ -195,4 +200,55 @@ func (s *TokenPrice) SavePriceData(token, chainId, price string) error {
 	}
 
 	return nil
+}
+
+// SavePlgrPrice Saving price data to mysql if it has new price
+func (s *TokenPrice) SavePlgrPrice() {
+	priceStr, _ := db.RedisGetString("plgr_price")
+	priceF, _ := decimal.NewFromString(priceStr)
+	e8 := decimal.NewFromInt(100000000)
+	priceF = priceF.Mul(e8)
+	price := priceF.IntPart()
+
+	ethereumConn, err := ethclient.Dial(config.Config.MainNet.NetUrl)
+	if nil != err {
+		log.Logger.Error(err.Error())
+		return
+	}
+	bscPledgeOracleMainNetToken, err := bindings.NewBscPledgeOracleMainnetToken(common.HexToAddress(config.Config.MainNet.BscPledgeOracleToken), ethereumConn)
+	if nil != err {
+		log.Logger.Error(err.Error())
+		return
+	}
+
+	privateKeyEcdsa, err := crypto.HexToECDSA(config.Config.MainNet.ContractAdminTokenPrivateKey)
+	if err != nil {
+		log.Logger.Error(err.Error())
+		return
+	}
+
+	auth, err := bind.NewKeyedTransactorWithChainID(privateKeyEcdsa, big.NewInt(utils.StringToInt64(config.Config.MainNet.ChainId)))
+	if err != nil {
+		log.Logger.Error(err.Error())
+		return
+	}
+
+	ctx, cancel := context.WithTimeout(context.Background(), time.Duration(time.Second*5))
+	defer cancel()
+
+	transactOpts := bind.TransactOpts{
+		From:      auth.From,
+		Nonce:     nil,
+		Signer:    auth.Signer, // Method to use for signing the transaction (mandatory)
+		Value:     big.NewInt(0),
+		GasPrice:  nil,
+		GasFeeCap: nil,
+		GasTipCap: nil,
+		GasLimit:  0,
+		Context:   ctx,
+		NoSend:    false, // Do all transact steps but do not send the transaction
+	}
+
+	_, err = bscPledgeOracleMainNetToken.SetPrice(&transactOpts, common.HexToAddress(config.Config.MainNet.PlgrAddress), big.NewInt(price))
+
 }

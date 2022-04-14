@@ -3,13 +3,12 @@ package abifile
 import (
 	"os"
 	"path"
-	"pledge-backend/config"
 	"runtime"
 )
 
 func GetAbiByToken(token string) (string, error) {
 	currentAbPath := GetCurrentAbPathByCaller()
-	by, err := os.ReadFile(currentAbPath + "/v" + config.Config.Env.Version + "/" + token + ".abi")
+	by, err := os.ReadFile(currentAbPath + "/" + token + ".abi")
 	if err != nil {
 		return "", err
 	}
