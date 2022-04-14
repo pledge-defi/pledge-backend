@@ -3,11 +3,15 @@ package tasks
 import (
 	"github.com/jasonlvhit/gocron"
 	"pledge-backend/db"
+	"pledge-backend/schedule/common"
 	"pledge-backend/schedule/services"
 	"time"
 )
 
 func Task() {
+
+	// get environment variables
+	common.GetEnv()
 
 	// flush redis db
 	err := db.RedisFlushDB()

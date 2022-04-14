@@ -2,7 +2,6 @@ package main
 
 import (
 	"pledge-backend/db"
-	"pledge-backend/schedule/common"
 	"pledge-backend/schedule/tasks"
 )
 
@@ -13,9 +12,6 @@ func main() {
 
 	// init redis
 	db.InitRedis()
-
-	// get environment variables
-	common.GetEnv()
 
 	// pool task
 	tasks.Task()
