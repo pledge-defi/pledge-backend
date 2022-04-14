@@ -31,7 +31,7 @@ contract_admin_token_private_key = "1da17eeca743098a8b9ccf29cfd0ed6719f160df552e
 [mainnet]
 chain_id = "56"
 net_url = "https://bsc-dataseed2.ninicoin.io"
-plgr_address = "0x6aa91cbfe045f9d154050226fcc830ddba886ced"
+plgr_address = "0X6AA91CBFE045F9D154050226FCC830DDBA886CED"
 pledge_pool_token = "0x78CE5055149Dc30755612209f9d9A98f36fb022E"
 bsc_pledge_oracle_token = "0x6cc2B5D12aD1Cc66149F2fb895ca863e9aEbD31e"
 contract_admin_token_private_key = "fa32a931c5d38019f7e13e84e9cda416851adf61f2e87e53e6232629beed73f7"
