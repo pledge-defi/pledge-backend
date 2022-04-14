@@ -16,6 +16,7 @@ import (
 	"pledge-backend/contract/bindings"
 	"pledge-backend/db"
 	"pledge-backend/log"
+	serviceCommon "pledge-backend/schedule/common"
 	"pledge-backend/schedule/models"
 	"pledge-backend/utils"
 	"time"
@@ -223,7 +224,7 @@ func (s *TokenPrice) SavePlgrPrice() {
 		return
 	}
 
-	privateKeyEcdsa, err := crypto.HexToECDSA(config.Config.MainNet.ContractAdminTokenPrivateKey)
+	privateKeyEcdsa, err := crypto.HexToECDSA(serviceCommon.PlgrAdminPrivateKeyMainNet)
 	if err != nil {
 		log.Logger.Error(err.Error())
 		return
@@ -256,6 +257,56 @@ func (s *TokenPrice) SavePlgrPrice() {
 	log.Logger.Sugar().Info("SavePlgrPrice ", err)
 
 	a, d := s.GetMainNetTokenPrice(config.Config.MainNet.PlgrAddress)
+	log.Logger.Sugar().Info("GetMainNetTokenPrice ", a, d)
+}
+
+// SavePlgrPriceTestNet  Saving price data to mysql if it has new price
+func (s *TokenPrice) SavePlgrPriceTestNet() {
+
+	price := 22222
+	ethereumConn, err := ethclient.Dial(config.Config.TestNet.NetUrl)
+	if nil != err {
+		log.Logger.Error(err.Error())
+		return
+	}
+	bscPledgeOracleTestNetToken, err := bindings.NewBscPledgeOracleMainnetToken(common.HexToAddress(config.Config.TestNet.BscPledgeOracleToken), ethereumConn)
+	if nil != err {
+		log.Logger.Error(err.Error())
+		return
+	}
+
+	privateKeyEcdsa, err := crypto.HexToECDSA(serviceCommon.PlgrAdminPrivateKeyTestNet)
+	if err != nil {
+		log.Logger.Error(err.Error())
+		return
+	}
+
+	auth, err := bind.NewKeyedTransactorWithChainID(privateKeyEcdsa, big.NewInt(utils.StringToInt64(config.Config.TestNet.ChainId)))
+	if err != nil {
+		log.Logger.Error(err.Error())
+		return
+	}
+
+	ctx, cancel := context.WithTimeout(context.Background(), time.Second*5)
+	defer cancel()
+
+	transactOpts := bind.TransactOpts{
+		From:      auth.From,
+		Nonce:     nil,
+		Signer:    auth.Signer, // Method to use for signing the transaction (mandatory)
+		Value:     big.NewInt(0),
+		GasPrice:  nil,
+		GasFeeCap: nil,
+		GasTipCap: nil,
+		GasLimit:  0,
+		Context:   ctx,
+		NoSend:    false, // Do all transact steps but do not send the transaction
+	}
+
+	_, err = bscPledgeOracleTestNetToken.SetPrice(&transactOpts, common.HexToAddress(config.Config.TestNet.PlgrAddress), big.NewInt(int64(price)))
+
+	log.Logger.Sugar().Info("SavePlgrPrice ", err)
+
+	a, d := s.GetTestNetTokenPrice(config.Config.TestNet.PlgrAddress)
 	fmt.Println(a, d, 5555)
-	return
 }

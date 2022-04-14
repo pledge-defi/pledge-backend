@@ -26,7 +26,6 @@ net_url = "https://data-seed-prebsc-1-s1.binance.org:8545"
 plgr_address = "0X6AA91CBFE045F9D154050226FCC830DDBA886CED"
 pledge_pool_token = "0x216f718A983FCCb462b338FA9c60f2A89199490c"
 bsc_pledge_oracle_token = "0xd96DBDC193617A0cD4bbf38E78a0fB4799A8E554"
-contract_admin_token_private_key = "1da170df552e4ac33db23c51e66caef4"
 
 [mainnet]
 chain_id = "56"
@@ -34,7 +33,6 @@ net_url = "https://bsc-dataseed2.ninicoin.io"
 plgr_address = "0X6AA91CBFE045F9D154050226FCC830DDBA886CED"
 pledge_pool_token = "0x78CE5055149Dc30755612209f9d9A98f36fb022E"
 bsc_pledge_oracle_token = "0x6cc2B5D12aD1Cc66149F2fb895ca863e9aEbD31e"
-contract_admin_token_private_key = "41685132629beed73f7"
 
 [token]
 logo_url = "https://tokens.pancakeswap.finance/pancakeswap-top-100.json"
