@@ -9,6 +9,7 @@ Restart=always
 RestartSec=1
 User=root
 ExecStart=/home/ubuntu/codespace/pledge-backend/schedule/pledge_task
+Environment="PATH=/etc/systemd/pledge.env"
 [Install]
 WantedBy=multi-user.target
 

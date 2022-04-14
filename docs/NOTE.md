@@ -7,3 +7,5 @@ The go token files of the main network and the test network need to be generated
 
     pledge_pool_token           //get pool information 
     bsc_pledge_oracle_token     //get token price
+
+/etc/systemd/system.conf 

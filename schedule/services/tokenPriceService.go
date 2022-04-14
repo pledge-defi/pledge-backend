@@ -224,7 +224,7 @@ func (s *TokenPrice) SavePlgrPrice() {
 		return
 	}
 
-	privateKeyEcdsa, err := crypto.HexToECDSA(serviceCommon.PlgrAdminPrivateKeyMainNet)
+	privateKeyEcdsa, err := crypto.HexToECDSA(serviceCommon.PlgrAdminPrivateKey)
 	if err != nil {
 		log.Logger.Error(err.Error())
 		return
@@ -275,7 +275,7 @@ func (s *TokenPrice) SavePlgrPriceTestNet() {
 		return
 	}
 
-	privateKeyEcdsa, err := crypto.HexToECDSA(serviceCommon.PlgrAdminPrivateKeyTestNet)
+	privateKeyEcdsa, err := crypto.HexToECDSA(serviceCommon.PlgrAdminPrivateKey)
 	if err != nil {
 		log.Logger.Error(err.Error())
 		return
