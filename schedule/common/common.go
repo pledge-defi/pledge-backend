@@ -12,7 +12,7 @@ func GetEnv() {
 
 	var ok bool
 
-	PlgrAdminPrivateKeyTestNet, ok = os.LookupEnv("plgr_admin_private_key_test_net")
+	PlgrAdminPrivateKeyTestNet, ok = os.LookupEnv("PLGR_PRIVATE_KEY")
 	if !ok {
 		log.Logger.Error("environment variable is not set")
 		panic("environment variable is not set")
