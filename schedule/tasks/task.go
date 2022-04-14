@@ -15,7 +15,7 @@ func Task() {
 		panic("clear redis error " + err.Error())
 	}
 
-	//run pool task v21
+	//run pool task
 	s := gocron.NewScheduler()
 	s.ChangeLoc(time.UTC)
 	_ = s.Every(2).Minutes().From(gocron.NextTick()).Do(services.NewPool().UpdateAllPoolInfo)
@@ -23,6 +23,7 @@ func Task() {
 	_ = s.Every(2).Hours().From(gocron.NextTick()).Do(services.NewTokenSymbol().UpdateContractSymbol)
 	_ = s.Every(2).Hours().From(gocron.NextTick()).Do(services.NewTokenLogo().UpdateTokenLogo)
 	_ = s.Every(30).Minutes().From(gocron.NextTick()).Do(services.NewBalanceMonitor().Monitor)
+	_ = s.Every(30).Minutes().From(gocron.NextTick()).Do(services.NewTokenPrice().SavePlgrPrice)
 	<-s.Start() // Start all the pending jobs
 
 }
