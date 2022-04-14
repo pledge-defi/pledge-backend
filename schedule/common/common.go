@@ -2,6 +2,7 @@ package common
 
 import (
 	"os"
+	"pledge-backend/log"
 	"strings"
 )
 
@@ -17,6 +18,7 @@ func Getenv() {
 	PlgrAdminPrivateKeyMainNet = strings.Replace(PlgrAdminPrivateKeyMainNet, " ", "", -1)
 
 	if PlgrAdminPrivateKeyTestNet == "" || PlgrAdminPrivateKeyMainNet == "" {
+		log.Logger.Error("environment variable is not set")
 		panic("environment variable is not set")
 	}
 
