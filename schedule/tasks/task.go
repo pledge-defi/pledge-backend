@@ -16,7 +16,6 @@ func Task() {
 	}
 
 	//init task
-
 	services.NewPool().UpdateAllPoolInfo()
 	services.NewTokenPrice().UpdateContractPrice()
 	services.NewTokenSymbol().UpdateContractSymbol()
