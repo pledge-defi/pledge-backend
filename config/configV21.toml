@@ -23,16 +23,16 @@ idle_timeout = 0
 [testnet]
 chain_id = "97"
 net_url = "https://data-seed-prebsc-1-s1.binance.org:8545"
-plgr_address = "0x22E6f32805d2AC7F787ca72b2F0bdbCE1693573b"
+plgr_address = "0x80a4D82f1879c7933ee9aa266E8580abaaa9b7c2"
 pledge_pool_token = "0xb996788A2471f34ad301dD5090d85521Da252ED4"
-bsc_pledge_oracle_token = "0xd96DBDC193617A0cD4bbf38E78a0fB4799A8E554"
+bsc_pledge_oracle_token = "0x4F72DFa7E151767eC583bbaE7cf878Ed12d6c111"
 
 [mainnet]
 chain_id = "56"
 net_url = "https://bsc-dataseed2.ninicoin.io"
-plgr_address = "0x6aa91cbfe045f9d154050226fcc830ddba886ced"
+plgr_address = "0x25C3f3d3E3299d7C56700CE54303Fbe1E6a16fee"
 pledge_pool_token = "0x78CE5055149Dc30755612209f9d9A98f36fb022E"
-bsc_pledge_oracle_token = "0x6cc2B5D12aD1Cc66149F2fb895ca863e9aEbD31e"
+bsc_pledge_oracle_token = "0x4Aa9EB3149089D7208C9C0403BF1b9bA25ff05BD"
 
 [token]
 logo_url = "https://tokens.pancakeswap.finance/pancakeswap-top-100.json"
