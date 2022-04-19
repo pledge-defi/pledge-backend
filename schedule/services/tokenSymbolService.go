@@ -86,8 +86,6 @@ func (s *TokenSymbol) GetRemoteAbiFileByToken(token, chainId string) error {
 
 	resStr := s.FormatAbiJsonStr(string(res))
 
-	fmt.Println(resStr)
-
 	abiJson := models.AbiJson{}
 	err = json.Unmarshal([]byte(resStr), &abiJson)
 	if err != nil {
@@ -128,10 +126,6 @@ func (s *TokenSymbol) FormatAbiJsonStr(result string) string {
 	resStr := strings.Replace(result, `\`, "", -1)
 	resStr = strings.Replace(resStr, `"[{`, `[{`, -1)
 	resStr = strings.Replace(resStr, `}]"`, `}]`, -1)
-	//resStr = strings.Replace(resStr, `result\":\"[`, `result":[`, -1)
-	//resStr = strings.Replace(resStr, `result":"[`, `result":[`, -1)
-	//resStr = strings.Replace(resStr, `]\"}`, `]}`, -1)
-	//resStr = strings.Replace(resStr, `]"}`, `]}`, -1)
 	return resStr
 }
 
