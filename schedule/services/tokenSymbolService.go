@@ -133,31 +133,29 @@ func (s *TokenSymbol) FormatAbiJsonStr(result string) string {
 func (s *TokenSymbol) GetContractSymbolOnMainNet(token, network string) (error, string) {
 	ethereumConn, err := ethclient.Dial(network)
 	if nil != err {
-		log.Logger.Sugar().Error("GetContractSymbolOnMainNet err", token, err)
+		log.Logger.Sugar().Error("GetContractSymbolOnMainNet err ", token, err)
 		return err, ""
 	}
 	abiStr, err := abifile.GetAbiByToken(token)
-	fmt.Println(abiStr)
-	fmt.Println("9((((((((((((((((9999")
 	if err != nil {
-		log.Logger.Sugar().Error("GetContractSymbolOnMainNet err", token, err)
+		log.Logger.Sugar().Error("GetContractSymbolOnMainNet err ", token, err)
 		return err, ""
 	}
 	parsed, err := abi.JSON(strings.NewReader(abiStr))
 	if err != nil {
-		log.Logger.Sugar().Error("GetContractSymbolOnMainNet err", token, err)
+		log.Logger.Sugar().Error("GetContractSymbolOnMainNet err ", token, err)
 		return err, ""
 	}
 	contract, err := bind.NewBoundContract(common.HexToAddress(token), parsed, ethereumConn, ethereumConn, ethereumConn), nil
 	if err != nil {
-		log.Logger.Sugar().Error("GetContractSymbolOnMainNet err", token, err)
+		log.Logger.Sugar().Error("GetContractSymbolOnMainNet err ", token, err)
 		return err, ""
 	}
 
 	res := make([]interface{}, 0)
 	err = contract.Call(nil, &res, "symbol")
 	if err != nil {
-		log.Logger.Sugar().Error("GetContractSymbolOnMainNet err", err)
+		log.Logger.Sugar().Error("GetContractSymbolOnMainNet err ", err)
 		return err, ""
 	}
 
