@@ -95,8 +95,7 @@ func (s *TokenSymbol) GetRemoteAbiFileByToken(token, chainId string) error {
 	}
 
 	if abiJson.Status != "1" {
-		fmt.Println(resStr)
-		log.Logger.Error("get remote abi file failed: status 0 ")
+		log.Logger.Sugar().Error("get remote abi file failed: status 0 ", resStr)
 		return errors.New("get remote abi file failed: status 0 ")
 	}
 
