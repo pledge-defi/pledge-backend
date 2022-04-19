@@ -19,6 +19,7 @@ import (
 	serviceCommon "pledge-backend/schedule/common"
 	"pledge-backend/schedule/models"
 	"pledge-backend/utils"
+	"strings"
 	"time"
 )
 
@@ -44,16 +45,18 @@ func (s *TokenPrice) UpdateContractPrice() {
 			if t.ChainId == "97" {
 				err, price = s.GetTestNetTokenPrice(t.Token)
 			} else if t.ChainId == "56" {
-				//if strings.ToUpper(t.Token) == config.Config.MainNet.PlgrAddress { // get PLGR price from ku-coin(Only main network price)
-				//	priceStr, _ := db.RedisGetString("plgr_price")
-				//	priceF, _ := decimal.NewFromString(priceStr)
-				//	e8 := decimal.NewFromInt(100000000)
-				//	priceF = priceF.Mul(e8)
-				//	price = priceF.IntPart()
-				//} else {
-				//	err, price = s.GetMainNetTokenPrice(t.Token)
-				//}
-				err, price = s.GetMainNetTokenPrice(t.Token)
+				if strings.ToUpper(t.Token) == config.Config.MainNet.PlgrAddress { // get PLGR price from ku-coin(Only main network price)
+					priceStr, _ := db.RedisGetString("plgr_price")
+					priceF, _ := decimal.NewFromString(priceStr)
+					e8 := decimal.NewFromInt(100000000)
+					priceF = priceF.Mul(e8)
+					price = priceF.IntPart()
+				} else {
+					err, price = s.GetMainNetTokenPrice(t.Token)
+				}
+
+				//err, price = s.GetMainNetTokenPrice(t.Token)
+
 			}
 
 			if err != nil {
@@ -212,7 +215,6 @@ func (s *TokenPrice) SavePlgrPrice() {
 	priceF = priceF.Mul(e8)
 	price := priceF.IntPart()
 
-	price = 22222
 	ethereumConn, err := ethclient.Dial(config.Config.MainNet.NetUrl)
 	if nil != err {
 		log.Logger.Error(err.Error())

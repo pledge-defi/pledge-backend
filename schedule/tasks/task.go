@@ -26,7 +26,7 @@ func Task() {
 	services.NewTokenLogo().UpdateTokenLogo()
 	services.NewBalanceMonitor().Monitor()
 	//services.NewTokenPrice().SavePlgrPrice()
-	services.NewTokenPrice().SavePlgrPriceTestNet()
+	//services.NewTokenPrice().SavePlgrPriceTestNet()
 
 	//run pool task
 	s := gocron.NewScheduler()
@@ -37,7 +37,7 @@ func Task() {
 	_ = s.Every(2).Hours().From(gocron.NextTick()).Do(services.NewTokenLogo().UpdateTokenLogo)
 	_ = s.Every(30).Minutes().From(gocron.NextTick()).Do(services.NewBalanceMonitor().Monitor)
 	//_ = s.Every(30).Minutes().From(gocron.NextTick()).Do(services.NewTokenPrice().SavePlgrPrice)
-	_ = s.Every(30).Minutes().From(gocron.NextTick()).Do(services.NewTokenPrice().SavePlgrPriceTestNet)
+	//_ = s.Every(30).Minutes().From(gocron.NextTick()).Do(services.NewTokenPrice().SavePlgrPriceTestNet)
 	<-s.Start() // Start all the pending jobs
 
 }
