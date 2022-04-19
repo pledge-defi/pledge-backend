@@ -1,9 +1,9 @@
 package models
 
 type AbiJson struct {
-	Status  string   `json:"status"`
-	Message string   `json:"message"`
-	Result  []Result `json:"result"`
+	Status  string      `json:"status"`
+	Message string      `json:"message"`
+	Result  interface{} `json:"result"`
 }
 
 type Outputs struct {
@@ -11,7 +11,7 @@ type Outputs struct {
 	Name         string `json:"name"`
 	Type         string `json:"type"`
 }
-type Result struct {
+type AbiData struct {
 	Inputs          []interface{} `json:"inputs"`
 	Payable         bool          `json:"payable,omitempty"`
 	StateMutability string        `json:"stateMutability,omitempty"`
