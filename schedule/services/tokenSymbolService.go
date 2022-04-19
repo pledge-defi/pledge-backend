@@ -99,6 +99,7 @@ func (s *TokenSymbol) GetRemoteAbiFileByToken(token, chainId string) error {
 		return errors.New("get remote abi file failed: status 0 ")
 	}
 
+	// marshal and format
 	abiJsonBytes, err := json.MarshalIndent(abiJson.Result, "", "\t")
 	if err != nil {
 		log.Logger.Error(err.Error())
