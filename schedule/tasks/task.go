@@ -3,6 +3,7 @@ package tasks
 import (
 	"github.com/jasonlvhit/gocron"
 	"pledge-backend/db"
+	"pledge-backend/schedule/common"
 	"pledge-backend/schedule/services"
 	"time"
 )
@@ -10,7 +11,7 @@ import (
 func Task() {
 
 	// get environment variables
-	//common.GetEnv()
+	common.GetEnv()
 
 	// flush redis db
 	err := db.RedisFlushDB()
@@ -25,7 +26,6 @@ func Task() {
 	services.NewTokenLogo().UpdateTokenLogo()
 	services.NewBalanceMonitor().Monitor()
 	//services.NewTokenPrice().SavePlgrPrice()
-	//services.NewTokenPrice().SavePlgrPriceTestNet()
 
 	//run pool task
 	s := gocron.NewScheduler()
@@ -36,7 +36,6 @@ func Task() {
 	_ = s.Every(2).Hours().From(gocron.NextTick()).Do(services.NewTokenLogo().UpdateTokenLogo)
 	_ = s.Every(30).Minutes().From(gocron.NextTick()).Do(services.NewBalanceMonitor().Monitor)
 	//_ = s.Every(30).Minutes().From(gocron.NextTick()).Do(services.NewTokenPrice().SavePlgrPrice)
-	//_ = s.Every(30).Minutes().From(gocron.NextTick()).Do(services.NewTokenPrice().SavePlgrPriceTestNet)
 	<-s.Start() // Start all the pending jobs
 
 }
