@@ -29,7 +29,7 @@ bsc_pledge_oracle_token = "0x4F72DFa7E151767eC583bbaE7cf878Ed12d6c111"
 
 [mainnet]
 chain_id = "56"
-net_url = "https://bsc-dataseed2.ninicoin.io"
+net_url = "https://bsc-dataseed.binance.org"
 plgr_address = "0x6aa91cbfe045f9d154050226fcc830ddba886ced"
 pledge_pool_token = "0x25C3f3d3E3299d7C56700CE54303Fbe1E6a16fee"
 bsc_pledge_oracle_token = "0x4Aa9EB3149089D7208C9C0403BF1b9bA25ff05BD"
