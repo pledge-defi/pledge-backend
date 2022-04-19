@@ -74,6 +74,7 @@ func (s *TokenSymbol) UpdateContractSymbol() {
 
 // GetRemoteAbiFileByToken get and save remote abi file on main net
 func (s *TokenSymbol) GetRemoteAbiFileByToken(token, chainId string) error {
+
 	url := "https://api.bscscan.com/api?module=contract&action=getabi&apikey=HJ3WS4N88QJ6S7PQ8D89BD49IZIFP1JFER&address=" + token
 
 	fmt.Println(url)
@@ -103,9 +104,6 @@ func (s *TokenSymbol) GetRemoteAbiFileByToken(token, chainId string) error {
 		log.Logger.Error(err.Error())
 		return err
 	}
-
-	fmt.Println(string(abiJsonBytes))
-	fmt.Println("--------------")
 
 	newAbiFile := abifile.GetCurrentAbPathByCaller() + "/" + token + ".abi"
 
