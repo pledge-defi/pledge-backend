@@ -223,7 +223,7 @@ func HttpGet(url string) ([]byte, error) {
 	req.Header.Add("user-agent", "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_16_0) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/78.0.3904.108 Safari/537.36")
 	req.Header.Add("authority", "api.bscscan.com")
 
-	client := &http.Client{Timeout: 5 * time.Second}
+	client := &http.Client{Timeout: 3 * time.Second}
 	resp, err := client.Do(req)
 	if err != nil {
 		return nil, err
