@@ -52,7 +52,7 @@ func (s *TokenSymbol) UpdateContractSymbol() {
 			continue
 		}
 		if err != nil {
-			log.Logger.Sugar().Error("UpdateContractSymbol err", t.Symbol, t.ChainId, err)
+			log.Logger.Sugar().Error("UpdateContractSymbol err ", t.Symbol, t.ChainId, err)
 			continue
 		}
 
@@ -137,6 +137,8 @@ func (s *TokenSymbol) GetContractSymbolOnMainNet(token, network string) (error, 
 		return err, ""
 	}
 	abiStr, err := abifile.GetAbiByToken(token)
+	fmt.Println(abiStr)
+	fmt.Println("9((((((((((((((((9999")
 	if err != nil {
 		log.Logger.Sugar().Error("GetContractSymbolOnMainNet err", token, err)
 		return err, ""
