@@ -26,7 +26,7 @@ func NewPoolData() *PoolData {
 func (p *PoolData) PoolDataInfo(chainId int, res *[]PoolDataInfoRes) error {
 	var poolData []PoolData
 
-	err := db.Mysql.Table("poolData").Where("chain_id=?", chainId).Order("pool_id asc").Find(&poolData).Debug().Error
+	err := db.Mysql.Table("pooldata").Where("chain_id=?", chainId).Order("pool_id asc").Find(&poolData).Debug().Error
 	if err != nil {
 		return err
 	}
