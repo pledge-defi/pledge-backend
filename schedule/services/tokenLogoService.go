@@ -22,7 +22,7 @@ func NewTokenLogo() *TokenLogo {
 func (s *TokenLogo) UpdateTokenLogo() {
 
 	// update remote logo
-	res, err := utils.HttpGet(config.Config.Token.LogoUrl)
+	res, err := utils.HttpGet(config.Config.Token.LogoUrl, map[string]string{})
 	if err != nil {
 		log.Logger.Sugar().Info("UpdateTokenLogo HttpGet err", err)
 	} else {

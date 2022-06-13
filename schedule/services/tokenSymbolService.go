@@ -3,7 +3,6 @@ package services
 import (
 	"encoding/json"
 	"errors"
-	"fmt"
 	"github.com/ethereum/go-ethereum/accounts/abi"
 	"github.com/ethereum/go-ethereum/accounts/abi/bind"
 	"github.com/ethereum/go-ethereum/common"
@@ -77,9 +76,7 @@ func (s *TokenSymbol) GetRemoteAbiFileByToken(token, chainId string) error {
 
 	url := "https://api.bscscan.com/api?module=contract&action=getabi&apikey=HJ3WS4N88QJ6S7PQ8D89BD49IZIFP1JFER&address=" + token
 
-	fmt.Println(url)
-
-	res, err := utils.HttpGet(url)
+	res, err := utils.HttpGet(url, map[string]string{})
 	if err != nil {
 		log.Logger.Error(err.Error())
 		return err

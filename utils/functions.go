@@ -161,7 +161,7 @@ func Unwrap(num int64, retain int) float64 {
 	return float64(num) / math.Pow10(retain)
 }
 
-//精准float64
+// WrapToFloat64 精准float64
 func WrapToFloat64(num float64, retain int) float64 {
 	return num * math.Pow10(retain)
 }
