@@ -234,7 +234,7 @@ func HttpGet(url string, header map[string]string) ([]byte, error) {
 	return ioutil.ReadAll(resp.Body)
 }
 
-func Post(uri string, header map[string]string, data interface{}, args ...string) ([]byte, error) {
+func HttpPost(uri string, header map[string]string, data interface{}, args ...string) ([]byte, error) {
 
 	jsonStr, err := json.Marshal(data)
 	if err != nil {
