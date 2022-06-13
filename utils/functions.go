@@ -209,82 +209,62 @@ func Encryption() string {
 	return CreateCaptcha() + CreateCaptcha()
 }
 
-/*
-HttpGet发送GET请求
-url:请求地址
-response:请求返回的内容
-*/
-
-func HttpGet(url string) ([]byte, error) {
+func HttpGet(url string, header map[string]string) ([]byte, error) {
 	req, err := http.NewRequest("GET", url, nil)
+	defer func(Body io.ReadCloser) {
+		_ = Body.Close()
+	}(req.Body)
 	if err != nil {
-		panic(err)
+		return nil, err
 	}
-	req.Header.Add("user-agent", "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_16_0) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/78.0.3904.108 Safari/537.36")
-	req.Header.Add("authority", "api.bscscan.com")
 
-	client := &http.Client{Timeout: 3 * time.Second}
+	req.Header.Add("content-type", "application/json")
+	for k, v := range header {
+		req.Header.Add(k, v)
+	}
+	client := &http.Client{Timeout: 5 * time.Second}
 	resp, err := client.Do(req)
 	if err != nil {
 		return nil, err
 	}
+	defer func(Body io.ReadCloser) {
+		_ = Body.Close()
+	}(resp.Body)
 
-	defer resp.Body.Close()
+	return ioutil.ReadAll(resp.Body)
+}
 
-	result, err := ioutil.ReadAll(resp.Body)
+func Post(uri string, header map[string]string, data interface{}, args ...string) ([]byte, error) {
+
+	jsonStr, err := json.Marshal(data)
 	if err != nil {
 		return nil, err
 	}
 
-	return result, nil
-}
-
-// Post 发送POST请求
-//url:请求地址，data:POST请求提交的数据,contentType:请求体格式，如：application/json
-//content:请求放回的内容
-func Post(uri string, data interface{}, args ...string) (content string) {
-	var token, deviceId, platform string
-	//urlAll := common.TEST_LOCAL_HOST + uri
-	for number, _ := range args {
-		if number == 0 {
-			deviceId = args[number]
-		} else if number == 1 {
-			platform = args[number]
-		} else if number == 2 {
-			token = args[number]
-		} else if number == 3 {
-			uri = args[number] + uri
-		}
-	}
-	jsonStr, _ := json.Marshal(data)
 	req, err := http.NewRequest("POST", uri, bytes.NewBuffer(jsonStr))
 	if err != nil {
-		panic(err)
+		return nil, err
 	}
+
+	defer func(Body io.ReadCloser) {
+		_ = Body.Close()
+	}(req.Body)
+
 	req.Header.Add("content-type", "application/json")
-	req.Header.Add("deviceId", deviceId)
-	req.Header.Add("platform", platform)
-	req.Header.Add("token", token)
-	fmt.Println("")
-	fmt.Println("●●●●●●●●●●●●●●●●●●●●●●●●●●●●●●●			", uri, "		●●●●●●●●●●●●●●●●●●●●●●●●●●●●●●●")
-	fmt.Println("RequestHeader:	", "deviceId	", deviceId)
-	fmt.Println("				", "platform	", platform)
-	fmt.Println("				", "token		", token)
-	fmt.Println("RequestBody:	", string(jsonStr))
-	fmt.Println("")
-	defer req.Body.Close()
+	for k, v := range header {
+		req.Header.Add(k, v)
+	}
 
 	client := &http.Client{Timeout: 5 * time.Second}
-	resp, error := client.Do(req)
-	if error != nil {
-		panic(error)
+	resp, err := client.Do(req)
+	if err != nil {
+		return nil, err
 	}
-	defer resp.Body.Close()
+	defer func(Body io.ReadCloser) {
+		_ = Body.Close()
+	}(resp.Body)
 
-	result, _ := ioutil.ReadAll(resp.Body)
-	content = string(result)
-	fmt.Println("Response:		", string(content))
-	return
+	return ioutil.ReadAll(resp.Body)
 }
 
 // Float64AddToString float64 相加返回 string
